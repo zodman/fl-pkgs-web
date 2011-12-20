@@ -1,4 +1,9 @@
+import os, json
 from xml.etree import ElementTree
+
+def mkdir(path):
+    if not os.path.exists(path):
+        os.makedirs(path)
 
 def collect_builddep_list(xml):
     '''Collect (name, label, revision) tuples" from a <trovelist></trovelist>
@@ -39,8 +44,8 @@ class TroveInfo:
                 buildtime = int(e.text)
             elif e.tag == "buildlog":
                 buildlog = e.get("id")
-            elif e.tag == "builddeps":
-                builddeps = collect_builddep_list(e)
+            #elif e.tag == "builddeps":
+            #    builddeps = collect_builddep_list(e)
             elif e.tag == "included":
                 included = collect_component_list(e)
 
@@ -93,6 +98,21 @@ class Package:
     def __repr__(self):
         return "%s=%s/%s" % (self.name, self.label, self.revision)
 
+    def to_dict(self):
+        return {
+            "name": self.name,
+            "label": self.label,
+            "revision": self.revision,
+            "flavors": self.flavors,
+            "size": self.size,
+            "source": self.source,
+            "buildtime": self.buildtime,
+            "buildlog": self.buildlog,
+            # not outputing builddeps. Not sure if it's useful.
+            #"builddeps": self.builddeps,
+            "included": self.included,
+            }
+
 class Label:
     '''Container of information about a conary label
     '''
@@ -114,7 +134,7 @@ class Label:
             self._pkgs[pkg.name] = pkg
 
         if read_pkg_details:
-            for pkg in self._pkgs.values():
+            for pkg in self.get_pkgs():
                 pkg.read_info()
 
     def get_pkgs(self):
@@ -122,3 +142,47 @@ class Label:
 
     def get_pkg(self, name):
         return self._pkgs[name]
+
+    def to_dict(self):
+        return {"pkgs": [(p.name, p.revision) for p in self.get_pkgs()]}
+
+def write_info(src, dest, obj):
+    '''Put obj.to_json() to the @dest file.
+
+    @src is merely for logging here.
+    '''
+    print src, "=>", dest
+
+    f = open(dest, "w")
+    json.dump(obj.to_dict(), f)
+    f.close()
+
+def convert():
+    cache = "rawdata"
+    output = "info"
+    for b in [
+            "foresight.rpath.org@fl:2",
+            "foresight.rpath.org@fl:2-kernel",
+            "foresight.rpath.org@fl:2-qa",
+            "foresight.rpath.org@fl:2-qa-kernel"]:
+        branch = b.split("@")[-1]
+
+        src = "%s/%s" % (cache, b)
+        dest = "%s/%s" % (output, b)
+        if os.path.exists(dest):
+            continue
+        label = Label(b, cache, read_pkg_details=False)
+        mkdir("%s/%s" % (output, branch))
+        write_info(src, dest, label)
+
+        for pkg in label.get_pkgs()[:10]:
+            f = "%s-%s" % (pkg.name, pkg.revision)
+            src = "%s/%s/%s" % (cache, branch, f)
+            dest = "%s/%s/%s"  % (output, branch, f)
+            if os.path.exists(dest):
+                continue
+            pkg.read_info()
+            write_info(src, dest, pkg)
+
+if __name__ == "__main__":
+    convert()
