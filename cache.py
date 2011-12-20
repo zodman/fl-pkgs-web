@@ -60,11 +60,14 @@ def main():
 
     labels = [
         "foresight.rpath.org@fl:2",
+        "foresight.rpath.org@fl:2-kernel",
         "foresight.rpath.org@fl:2-qa",
+        "foresight.rpath.org@fl:2-qa-kernel",
         #"foresight.rpath.org@fl:2-devel",
+        #"foresight.rpath.org@fl:2-devel-kernel",
         ]
 
-    cache = "data"
+    cache = "rawdata"
     mkdir(cache)
     for b in labels:
         refresh_pkg_list(api_site, b, cache)
