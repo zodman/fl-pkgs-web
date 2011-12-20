@@ -75,7 +75,7 @@ class Package:
     def read_info(self):
         '''Read detailed information from cached data
         '''
-        subdir = self.label.split("@")[-1]
+        subdir = self.label.branch
         f = open("%s/%s/%s-%s" % (self._cache, subdir, self.name, self.revision))
         content = f.read()
         f.close()
@@ -96,12 +96,11 @@ class Package:
         self.included = info.included
 
     def __repr__(self):
-        return "%s=%s/%s" % (self.name, self.label, self.revision)
+        return "%s=%s" % (self.name, self.revision)
 
     def to_dict(self):
         return {
             "name": self.name,
-            "label": self.label,
             "revision": self.revision,
             "flavors": self.flavors,
             "size": self.size,
@@ -123,6 +122,7 @@ class Label:
         Could take a long time.
         '''
         self.name = label
+        self.branch = label.split("@")[1]
         self._pkgs = {}
 
         f = open("%s/%s" % (cache, label))
@@ -130,7 +130,7 @@ class Label:
         f.close()
 
         for e in ElementTree.XML(content):
-            pkg = Package(e, label, cache)
+            pkg = Package(e, self, cache)
             self._pkgs[pkg.name] = pkg
 
         if read_pkg_details:
