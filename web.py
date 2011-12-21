@@ -68,6 +68,7 @@ class Install:
         ret = []
         for b in self.labels:
             ret.extend(b.get_pkgs())
+        ret.sort(key=lambda p: p.name)
         return ret
 
     def get_pkg(self, name):
