@@ -38,6 +38,9 @@ class Label:
         data = json.load(f)
         f.close()
         for name, revision in data["pkgs"]:
+            if revision.startswith("0-"):
+                # nil pkg
+                continue
             self.pkgs[name] = Package(name, revision, self)
 
     def get_pkgs(self):
