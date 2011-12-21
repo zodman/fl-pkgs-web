@@ -2,6 +2,12 @@ import json
 
 from bottle import route, run, view, abort
 
+class SourceTrove:
+    def __init__(self, name, revision):
+        self.name = name
+        self.revision = revision
+        self.binpkgs = []
+
 class Package:
     def __init__(self, name, revision, label):
         self.name = name
@@ -28,31 +34,60 @@ class Package:
 
 class Label:
     def __init__(self, label):
-        self.pkgs = {}
         self.name = label
         self.branch = label.split("@")[1] # fl:2-devel etc
+        self._bin_pkgs = {}
+        self._src_pkgs = {}
 
-        # read json data
+        self._read_info()
+
+    def _read_info(self):
         f = open("info/%s" % self.name)
         data = json.load(f)
         f.close()
+
+        # read binary packages
         for name, revision in data["pkgs"]:
             if revision.startswith("0-"):
                 # nil pkg
                 continue
-            self.pkgs[name] = Package(name, revision, self)
+            pkg = Package(name, revision, self)
+            # read all info into memory
+            pkg.read_info()
+            self._bin_pkgs[name] = pkg
+
+        # read src packages
+        for name, revision in data["srcpkgs"]:
+            if revision.startswith("0-"):
+                # nil pkg
+                continue
+            pkg = SourceTrove(name, revision)
+            self._src_pkgs[name] = pkg
+
+        # associate :source with relevant pkgs
+        for k, p in self._bin_pkgs.items():
+            try:
+                self._src_pkgs[p.source].binpkgs.append(p)
+            except KeyError:
+                # when a pkg's :source can't be found, it means the :source has
+                # been redirected to nil, but the pkg is not (since it's a
+                # subpkg)
+                del self._bin_pkgs[k]
 
     def get_pkgs(self):
-        return self.pkgs.values()
+        return self._bin_pkgs.values()
 
     def get_pkg(self, name):
-        try:
-            pkg = self.pkgs[name]
-        except KeyError:
-            abort(404, "No such page")
-            return
-        pkg.read_info()
-        return pkg
+        '''Could raise KeyError
+        '''
+        return self._bin_pkgs[name]
+
+    def get_src_pkg(self, name):
+        '''Could raise KeyError
+        '''
+        if not ":" in name:
+            name += ":source"
+        return self._src_pkgs[name]
 
 class Install:
     '''An install can have several labels, e.g. 2-qa should include fl:2-qa and
@@ -78,7 +113,16 @@ class Install:
                 return pkg
             except KeyError:
                 continue
-        raise KeyError
+        abort(404, "No such page")
+
+    def get_src_pkg(self, name):
+        for b in self.labels:
+            try:
+                pkg = b.get_src_pkg(name)
+                return pkg
+            except KeyError:
+                continue
+        abort(404, "No such page")
 
 installs = {}
 
@@ -97,6 +141,12 @@ def show_install(inst):
 def show_pkg(inst, pkg):
     install = installs[inst]
     return dict(install=install, pkg=install.get_pkg(pkg))
+
+@route("/<inst:re:(2|2-qa)>/source/<pkg>")
+@view("srcpkg")
+def show_src_pkg(inst, pkg):
+    install = installs[inst]
+    return dict(install=install, src=install.get_src_pkg(pkg))
 
 if __name__ == "__main__":
     installs = {

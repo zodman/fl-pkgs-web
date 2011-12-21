@@ -19,3 +19,7 @@
   - install: a group of labels that are usually installed together to create a
     foresight release. For example foresight.rpath.org@fl:2 and
     foresight.rpath.org@fl:2-kernel.
+
+* issues:
+  - userspace-kernel-firmware is available on both 2-qa and 2-qa-kernel. Not
+    sure how to handle it.
