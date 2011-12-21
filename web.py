@@ -17,9 +17,6 @@ def format_flavors(flavors):
 def format_buildtime(buildtime):
     return time.strftime("%a, %d %b %Y %H:%M", time.localtime(buildtime))
 
-def format_included(included):
-    return ", ".join(["[%s]" % c for c in included])
-
 class SourceTrove:
     def __init__(self, name, revision):
         self.name = name
@@ -47,7 +44,7 @@ class Package:
         self.source = data["source"]
         self.buildtime = format_buildtime(data["buildtime"])
         self.buildlog = data["buildlog"]
-        self.included = format_included(data["included"])
+        self.included = data["included"]
 
         self._info_complete = True
 
