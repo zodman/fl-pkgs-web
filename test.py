@@ -12,8 +12,15 @@ class TestXMLConvert(unittest.TestCase):
         self.assertEqual(test_b, test_label.name)
         self.assertEqual(3556, len(test_label.get_pkgs()))
 
+    def test_src_pkg_list(self):
+        self.assertEqual(2322, len(test_label.get_src_pkgs()))
+
     def test_label_get_pkg(self):
         self.assertRaises(KeyError, test_label.get_pkg, "gitx")
+
+    def test_src_pkg_info(self):
+        pkg = [p for p in test_label.get_src_pkgs() if p.name == "git:source"][0]
+        self.assertEqual(pkg.revision, "1.7.7-1")
 
     def test_read_pkg_info(self):
         pkg = test_label.get_pkg("git")

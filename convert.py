@@ -112,6 +112,11 @@ class Package:
             "included": self.included,
             }
 
+class SourceTrove:
+    def __init__(self, xml):
+        self.name = xml.find("name").text
+        self.revision = xml.find("version").find("revision").text
+
 class Label:
     '''Container of information about a conary label
     '''
@@ -123,28 +128,48 @@ class Label:
         '''
         self.name = label
         self.branch = label.split("@")[1]
-        self._pkgs = {}
+        self._cache = cache
+        self._bin_pkgs = {}
+        self._src_pkgs = {}
 
-        f = open("%s/%s" % (cache, label))
+        self._read_bin_pkgs(read_pkg_details)
+        self._read_src_pkgs()
+
+    def _read_bin_pkgs(self, read_details):
+        f = open("%s/%s" % (self._cache, self.name))
         content = f.read()
         f.close()
 
         for e in ElementTree.XML(content):
-            pkg = Package(e, self, cache)
-            self._pkgs[pkg.name] = pkg
+            pkg = Package(e, self, self._cache)
+            self._bin_pkgs[pkg.name] = pkg
 
-        if read_pkg_details:
-            for pkg in self.get_pkgs():
+        if read_details:
+            for pkg in self._bin_pkgs.values():
                 pkg.read_info()
 
+    def _read_src_pkgs(self):
+        f = open("%s/source-%s" % (self._cache, self.name))
+        content = f.read()
+        f.close()
+
+        for e in ElementTree.XML(content):
+            pkg = SourceTrove(e)
+            self._src_pkgs[pkg.name] = pkg
+
     def get_pkgs(self):
-        return self._pkgs.values()
+        return self._bin_pkgs.values()
+
+    def get_src_pkgs(self):
+        return self._src_pkgs.values()
 
     def get_pkg(self, name):
-        return self._pkgs[name]
+        return self._bin_pkgs[name]
 
     def to_dict(self):
-        return {"pkgs": [(p.name, p.revision) for p in self.get_pkgs()]}
+        return {
+            "pkgs": [(p.name, p.revision) for p in self.get_pkgs()],
+            "srcpkgs": [(p.name, p.revision) for p in self.get_src_pkgs()]}
 
 def write_info(src, dest, obj):
     '''Put obj.to_json() to the @dest file.
