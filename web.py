@@ -31,7 +31,6 @@ class Label:
         self.pkgs = {}
         self.name = label
         self.branch = label.split("@")[1] # fl:2-devel etc
-        self.shortbranch = label.split(":")[1] # 2-devel etc
 
         # read json data
         f = open("info/%s" % self.name)
@@ -50,14 +49,43 @@ class Label:
         try:
             pkg = self.pkgs[name]
         except KeyError:
-            abort(404, "%s doesn't have %s" % (self.name, name))
+            abort(404, "No such page")
             return
         pkg.read_info()
         return pkg
 
-labels = {
-        "foresight.rpath.org@fl:2": Label("foresight.rpath.org@fl:2"),
-        "foresight.rpath.org@fl:2-qa": Label("foresight.rpath.org@fl:2-qa"),
+class Install:
+    '''An install can have several labels, e.g. 2-qa should include fl:2-qa and
+    fl:2-qa-kernel.
+
+    Not sure `install` is a good name.
+    '''
+    def __init__(self, name, labels):
+        self.name = name
+        self.labels = [Label(b) for b in labels]
+
+    def get_pkgs(self):
+        ret = []
+        for b in self.labels:
+            ret.extend(b.get_pkgs())
+        return ret
+
+    def get_pkg(self, name):
+        for b in self.labels:
+            try:
+                pkg = b.get_pkg(name)
+                return pkg
+            except KeyError:
+                continue
+        raise KeyError
+
+installs = {
+        "2": Install("2", [
+                "foresight.rpath.org@fl:2",
+                "foresight.rpath.org@fl:2-kernel"]),
+        "2-qa": Install("2-qa", [
+                "foresight.rpath.org@fl:2-qa",
+                "foresight.rpath.org@fl:2-qa-kernel"]),
         }
 
 @route("/")
@@ -65,27 +93,16 @@ labels = {
 def index():
     return {}
 
-@route("/<b:re:(2|2-qa)>")
-@view("label")
-def show_label(b):
-    if b == "2":
-        label = "foresight.rpath.org@fl:2"
-    elif b == "2-qa":
-        label = "foresight.rpath.org@fl:2-qa"
-    else:
-        return
-    return dict(label=labels[label])
+@route("/<inst:re:(2|2-qa)>")
+@view("install")
+def show_install(inst):
+    return dict(install=installs[inst])
 
-@route("/<b:re:(2|2-qa)>/<pkg>")
+@route("/<inst:re:(2|2-qa)>/<pkg>")
 @view("pkg")
-def show_pkg(b, pkg):
-    if b == "2":
-        label = "foresight.rpath.org@fl:2"
-    elif b == "2-qa":
-        label = "foresight.rpath.org@fl:2-qa"
-    else:
-        return
-    return dict(label=label, pkg=labels[label].get_pkg(pkg))
+def show_pkg(inst, pkg):
+    install = installs[inst]
+    return dict(install=install, pkg=install.get_pkg(pkg))
 
 if __name__ == "__main__":
     run(host="localhost", port=8080, reloader=True)

@@ -1,4 +1,4 @@
-<p>Page for {{pkg.name}} on branch {{pkg.label.branch}}<p>
+<p>Page for {{pkg.name}} on branch <a href="/{{install.name}}">{{install.name}}</a><p>
 <p>current version: {{pkg.revision}}</p>
 <p>size: {{pkg.size}}</p>
 <p>source: {{pkg.source}}</p>
