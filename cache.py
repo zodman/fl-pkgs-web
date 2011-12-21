@@ -58,7 +58,7 @@ def refresh_pkg_info(pkgs, cachedir):
 def refresh_pkg_list(api_site, label, cachedir):
     '''Fetch the list of pkgs, called 'nodes' in conary REST API.
     '''
-    api = "%s/node?label=%s&type=package" % (api_site, label)
+    api = "%s/node?label=%s&type=package&type=group" % (api_site, label)
     dest = "%s/%s" % (cachedir, label)
     content = fetch_api_data(api, dest)
 
