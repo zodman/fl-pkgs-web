@@ -57,7 +57,7 @@ class TroveInfo:
         self.included = included
 
 class Package:
-    def __init__(self, xml, label, cache):
+    def __init__(self, xml, label):
         self.label = label
         self.name = xml.find("name").text
         self.revision = xml.find("version").find("revision").text
@@ -70,13 +70,11 @@ class Package:
         self.builddeps = None # list of (name, label, revision, flavor) tuples
         self.included = None # list of (name, label, revision, flavor) tuples
 
-        self._cache = cache
-
     def read_info(self):
         '''Read detailed information from cached data
         '''
         subdir = self.label.branch
-        f = open("%s/%s/%s-%s" % (self._cache, subdir, self.name, self.revision))
+        f = open("%s/%s/%s-%s" % (self.label.cache, subdir, self.name, self.revision))
         content = f.read()
         f.close()
         self._parse(ElementTree.XML(content))
@@ -128,7 +126,7 @@ class Label:
         '''
         self.name = label
         self.branch = label.split("@")[1]
-        self._cache = cache
+        self.cache = cache
         self._bin_pkgs = {}
         self._src_pkgs = {}
 
@@ -136,12 +134,12 @@ class Label:
         self._read_src_pkgs()
 
     def _read_bin_pkgs(self, read_details):
-        f = open("%s/%s" % (self._cache, self.name))
+        f = open("%s/%s" % (self.cache, self.name))
         content = f.read()
         f.close()
 
         for e in ElementTree.XML(content):
-            pkg = Package(e, self, self._cache)
+            pkg = Package(e, self)
             self._bin_pkgs[pkg.name] = pkg
 
         if read_details:
@@ -149,7 +147,7 @@ class Label:
                 pkg.read_info()
 
     def _read_src_pkgs(self):
-        f = open("%s/source-%s" % (self._cache, self.name))
+        f = open("%s/source-%s" % (self.cache, self.name))
         content = f.read()
         f.close()
 
