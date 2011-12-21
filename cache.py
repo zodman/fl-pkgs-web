@@ -72,6 +72,34 @@ def refresh_source_list(api_site, label, cachedir):
     dest = "%s/source-%s" % (cachedir, label)
     fetch_api_data(api, dest)
 
+def refresh_components(labeldir):
+    '''Fetch info of components, which will have the list of files
+    '''
+    destdir = "%s/components" % labeldir
+    mkdir(destdir)
+    for fname in os.listdir(labeldir):
+        if fname.startswith("group-"):
+            continue
+        path = "%s/%s" % (labeldir, fname)
+        if not ("-" in fname and os.path.isfile(path)):
+            continue
+
+        f = open(path)
+        content = f.read()
+        f.close()
+
+        xml = ElementTree.XML(content)[0] # take the first of the trovelist
+
+        included = [(t.find("name").text,
+                     t.find("version").find("revision").text,
+                     t.get("id"))
+                         for t in xml.find("included").find("trovelist")]
+        for name, revision, infolink in included:
+            f = "%s/%s-%s" % (destdir, name, revision)
+            if os.path.exists(f):
+                continue
+            fetch_api_data(infolink, f)
+
 def main():
     api_site = "http://conary.foresightlinux.org/conary/api"
 
@@ -87,6 +115,7 @@ def main():
     for b in labels:
         refresh_source_list(api_site, b, cache)
         refresh_pkg_list(api_site, b, cache)
+        refresh_components("%s/%s" % (cache, b.split("@")[1]))
 
 if __name__ == "__main__":
     main()
