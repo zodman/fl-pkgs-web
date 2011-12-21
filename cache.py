@@ -38,22 +38,22 @@ def parse_pkg_list(xml):
     ret = [p for p in ret if not p.revision.startswith("0-")]
     return ret
 
-def clean_cache(cachedir, pkgs):
+def clean_cache(destdir, pkgs):
     tokeep = ["%s-%s" % (p.name, p.revision) for p in pkgs]
-    allfiles = os.listdir(cachedir)
+    allfiles = os.listdir(destdir)
     for f in set(allfiles) - set(tokeep):
-        t = "%s/%s" % (cachedir, f)
+        t = "%s/%s" % (destdir, f)
         log("removing %s" % t)
         os.remove(t)
 
-def refresh_pkg_info(pkgs, cachedir):
+def fetch_pkg_info(pkgs, destdir):
     '''Fetch detailed info about a pkg, from the 'trovelist' of the node
     '''
     for pkg in pkgs:
-        f = "%s/%s-%s" % (cachedir, pkg.name, pkg.revision)
+        f = "%s/%s-%s" % (destdir, pkg.name, pkg.revision)
         if not os.path.exists(f):
             fetch_api_data(pkg.trovelist, f)
-    clean_cache(cachedir, pkgs)
+    clean_cache(destdir, pkgs)
 
 def refresh_pkg_list(api_site, label, cachedir):
     '''Fetch the list of pkgs, called 'nodes' in conary REST API.
@@ -65,7 +65,7 @@ def refresh_pkg_list(api_site, label, cachedir):
     pkgs = parse_pkg_list(content)
     destdir = "%s/%s" % (cachedir, label.split("@")[-1])
     mkdir(destdir)
-    refresh_pkg_info(pkgs, destdir)
+    fetch_pkg_info(pkgs, destdir)
 
 def refresh_source_list(api_site, label, cachedir):
     api = "%s/node?label=%s&type=source" % (api_site, label)
