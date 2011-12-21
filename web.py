@@ -90,6 +90,9 @@ class Label:
     def get_pkgs(self):
         return self._bin_pkgs.values()
 
+    def get_src_pkgs(self):
+        return self._src_pkgs.values()
+
     def get_pkg(self, name):
         '''Could raise KeyError
         '''
@@ -116,6 +119,13 @@ class Install:
         ret = []
         for b in self.labels:
             ret.extend(b.get_pkgs())
+        ret.sort(key=lambda p: p.name)
+        return ret
+
+    def get_src_pkgs(self):
+        ret = []
+        for b in self.labels:
+            ret.extend(b.get_src_pkgs())
         ret.sort(key=lambda p: p.name)
         return ret
 
@@ -147,6 +157,13 @@ def index():
 @route("/<inst:re:(2|2-qa)>")
 @view("install")
 def show_install(inst):
+    return dict(install=installs[inst])
+
+@route("/<inst:re:(2|2-qa)>/source")
+@view("install-sources")
+def show_install_sources(inst):
+    '''List :source packages
+    '''
     return dict(install=installs[inst])
 
 @route("/<inst:re:(2|2-qa)>/<pkg>")
