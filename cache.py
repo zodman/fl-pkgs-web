@@ -14,48 +14,29 @@ class Package:
         self.revision = xmlelement.find("version").find("revision").text
         self.trovelist = xmlelement.find("trovelist").get("id")
 
-def parse_pkg_list(xml):
-    ret = [Package(e) for e in ElementTree.XML(xml)]
-    ret = [p for p in ret if not p.revision.startswith("0-")]
-    return ret
-
-def fetch_api_data(api):
+def fetch_api_data(api, dest):
+    '''Reading from url @api, and write to file @dest
+    '''
     log("reading %s" % urllib2.unquote(api))
     u = urllib2.urlopen(api)
     content = u.read()
     u.close()
-    return content
 
-def write_api_data(content, dest):
     log("writing %s" % dest)
     f = open(dest + ".new", "w")
     f.write(content)
     f.close()
     os.rename(dest + ".new", dest)
 
-# pkgs
-def refresh_pkg_list(api_site, label, cachedir):
-    content = fetch_api_data("%s/node?label=%s&type=package" % (api_site, label))
-    write_api_data(content, "%s/%s" % (cachedir, label))
+    return content
 
-    pkgs = parse_pkg_list(content)
-    destdir = "%s/%s" % (cachedir, label.split("@")[-1])
-    mkdir(destdir)
-    refresh_pkg_info(pkgs, destdir)
-
-# source
-def refresh_source_list(api_site, label, cachedir):
-    content = fetch_api_data("%s/node?label=%s&type=source" % (api_site, label))
-    write_api_data(content, "%s/source-%s" % (cachedir, label))
-
-# pkg info
-def refresh_pkg_info(pkgs, cachedir):
-    for pkg in pkgs:
-        f = "%s/%s-%s" % (cachedir, pkg.name, pkg.revision)
-        if not os.path.exists(f):
-            content = fetch_api_data(pkg.trovelist)
-            write_api_data(content, f)
-    clean_cache(cachedir, pkgs)
+def parse_pkg_list(xml):
+    '''Read a <nodelist> and return a list of pkgs contained within
+    '''
+    ret = [Package(e) for e in ElementTree.XML(xml)]
+    # drop nil pkgs
+    ret = [p for p in ret if not p.revision.startswith("0-")]
+    return ret
 
 def clean_cache(cachedir, pkgs):
     tokeep = ["%s-%s" % (p.name, p.revision) for p in pkgs]
@@ -65,6 +46,32 @@ def clean_cache(cachedir, pkgs):
         log("removing %s" % t)
         os.remove(t)
 
+def refresh_pkg_info(pkgs, cachedir):
+    '''Fetch detailed info about a pkg, from the 'trovelist' of the node
+    '''
+    for pkg in pkgs:
+        f = "%s/%s-%s" % (cachedir, pkg.name, pkg.revision)
+        if not os.path.exists(f):
+            fetch_api_data(pkg.trovelist, f)
+    clean_cache(cachedir, pkgs)
+
+def refresh_pkg_list(api_site, label, cachedir):
+    '''Fetch the list of pkgs, called 'nodes' in conary REST API.
+    '''
+    api = "%s/node?label=%s&type=package" % (api_site, label)
+    dest = "%s/%s" % (cachedir, label)
+    content = fetch_api_data(api, dest)
+
+    pkgs = parse_pkg_list(content)
+    destdir = "%s/%s" % (cachedir, label.split("@")[-1])
+    mkdir(destdir)
+    refresh_pkg_info(pkgs, destdir)
+
+def refresh_source_list(api_site, label, cachedir):
+    api = "%s/node?label=%s&type=source" % (api_site, label)
+    dest = "%s/source-%s" % (cachedir, label)
+    fetch_api_data(api, dest)
+
 def main():
     api_site = "http://conary.foresightlinux.org/conary/api"
 
@@ -73,8 +80,6 @@ def main():
         "foresight.rpath.org@fl:2-kernel",
         "foresight.rpath.org@fl:2-qa",
         "foresight.rpath.org@fl:2-qa-kernel",
-        #"foresight.rpath.org@fl:2-devel",
-        #"foresight.rpath.org@fl:2-devel-kernel",
         ]
 
     cache = "rawdata"
