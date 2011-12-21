@@ -1,6 +1,24 @@
-import json
+import time, json
 
 from bottle import route, run, view, abort
+
+def format_size(size):
+    if size < 1000:
+        size = "%dB" % size
+    elif size >= 1000 and size < 1000 * 1000:
+        size = "%.1fKB" % (size / 1000.0)
+    else:
+        size = "%.1fMB" % (size / 1000.0 / 1000.0)
+    return size
+
+def format_flavors(flavors):
+    return ", ".join(["[%s]" % str(f) for f in flavors])
+
+def format_buildtime(buildtime):
+    return time.strftime("%a, %d %b %Y %H:%M", time.localtime(buildtime))
+
+def format_included(included):
+    return ", ".join(["[%s]" % c for c in included])
 
 class SourceTrove:
     def __init__(self, name, revision):
@@ -23,12 +41,13 @@ class Package:
         branch = self.label.branch
         f = open("info/%s/%s-%s" % (branch, self.name, self.revision))
         data = json.load(f)
-        self.flavors = data["flavors"]
-        self.size = data["size"]
+
+        self.flavors = format_flavors(data["flavors"])
+        self.size = format_size(data["size"])
         self.source = data["source"]
-        self.buildtime = data["buildtime"]
+        self.buildtime = format_buildtime(data["buildtime"])
         self.buildlog = data["buildlog"]
-        self.included = data["included"]
+        self.included = format_included(data["included"])
 
         self._info_complete = True
 
