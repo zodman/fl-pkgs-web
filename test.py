@@ -10,10 +10,14 @@ test_label = convert.Label(test_b, cache="datatest", read_pkg_details=False)
 class TestXMLConvert(unittest.TestCase):
     def test_read_pkg_list(self):
         self.assertEqual(test_b, test_label.name)
-        self.assertEqual(3556, len(test_label.get_pkgs()))
+        self.assertEqual(3503, len(test_label.get_pkgs()))
 
     def test_src_pkg_list(self):
-        self.assertEqual(2322, len(test_label.get_src_pkgs()))
+        self.assertEqual(2269, len(test_label.get_src_pkgs()))
+
+    def test_no_nil_pkg(self):
+        self.assertEqual(0, len([p for p in test_label.get_pkgs() if p.revision.startswith("0-")]))
+        self.assertEqual(0, len([p for p in test_label.get_src_pkgs() if p.revision.startswith("0-")]))
 
     def test_label_get_pkg(self):
         self.assertRaises(KeyError, test_label.get_pkg, "gitx")

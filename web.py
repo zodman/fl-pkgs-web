@@ -48,9 +48,6 @@ class Label:
 
         # read binary packages
         for name, revision in data["pkgs"]:
-            if revision.startswith("0-"):
-                # nil pkg
-                continue
             pkg = Package(name, revision, self)
             # read all info into memory
             pkg.read_info()
@@ -58,9 +55,6 @@ class Label:
 
         # read src packages
         for name, revision in data["srcpkgs"]:
-            if revision.startswith("0-"):
-                # nil pkg
-                continue
             pkg = SourceTrove(name, revision)
             self._src_pkgs[name] = pkg
 

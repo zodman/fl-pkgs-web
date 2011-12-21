@@ -140,6 +140,8 @@ class Label:
 
         for e in ElementTree.XML(content):
             pkg = Package(e, self)
+            if pkg.revision.startswith("0-"):
+                continue
             self._bin_pkgs[pkg.name] = pkg
 
         if read_details:
@@ -153,6 +155,8 @@ class Label:
 
         for e in ElementTree.XML(content):
             pkg = SourceTrove(e)
+            if pkg.revision.startswith("0-"):
+                continue
             self._src_pkgs[pkg.name] = pkg
 
     def get_pkgs(self):
