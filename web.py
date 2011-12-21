@@ -80,14 +80,7 @@ class Install:
                 continue
         raise KeyError
 
-installs = {
-        "2": Install("2", [
-                "foresight.rpath.org@fl:2",
-                "foresight.rpath.org@fl:2-kernel"]),
-        "2-qa": Install("2-qa", [
-                "foresight.rpath.org@fl:2-qa",
-                "foresight.rpath.org@fl:2-qa-kernel"]),
-        }
+installs = {}
 
 @route("/")
 @view("index")
@@ -106,4 +99,13 @@ def show_pkg(inst, pkg):
     return dict(install=install, pkg=install.get_pkg(pkg))
 
 if __name__ == "__main__":
+    installs = {
+            "2": Install("2", [
+                    "foresight.rpath.org@fl:2",
+                    "foresight.rpath.org@fl:2-kernel"]),
+            "2-qa": Install("2-qa", [
+                    "foresight.rpath.org@fl:2-qa",
+                    "foresight.rpath.org@fl:2-qa-kernel"]),
+            }
+
     run(host="localhost", port=8080, reloader=True)
