@@ -166,16 +166,14 @@ def convert():
             "foresight.rpath.org@fl:2-qa",
             "foresight.rpath.org@fl:2-qa-kernel"]:
         branch = b.split("@")[-1]
+        mkdir("%s/%s" % (output, branch))
 
         src = "%s/%s" % (cache, b)
         dest = "%s/%s" % (output, b)
-        if os.path.exists(dest):
-            continue
         label = Label(b, cache, read_pkg_details=False)
-        mkdir("%s/%s" % (output, branch))
         write_info(src, dest, label)
 
-        for pkg in label.get_pkgs()[:10]:
+        for pkg in label.get_pkgs():
             f = "%s-%s" % (pkg.name, pkg.revision)
             src = "%s/%s/%s" % (cache, branch, f)
             dest = "%s/%s/%s"  % (output, branch, f)

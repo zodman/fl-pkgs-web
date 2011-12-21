@@ -6,6 +6,11 @@
 * web.py: server the JSON data to the web.
   - serves both HTML and JSON
 
+* usage:
+  - python cache.py | tee log-cache
+  - python convert.py | tee log-convert
+  - python web.py
+
 * taxonomy. In general the variables and classes are named using conary
   concepts, with a few exceptions such as "install".
   - repository: foresight.rpath.org
