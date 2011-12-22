@@ -57,6 +57,7 @@ class Label:
         self._src_pkgs = {}
 
         self._read_info()
+        self._all_info_complete = False
 
     def _read_info(self):
         f = open("info/%s" % self.name)
@@ -66,8 +67,6 @@ class Label:
         # read binary packages
         for name, revision in data["pkgs"]:
             pkg = Package(name, revision, self)
-            # read all info into memory
-            pkg.read_info()
             self._bin_pkgs[name] = pkg
 
         # read src packages
@@ -75,8 +74,13 @@ class Label:
             pkg = SourceTrove(name, revision)
             self._src_pkgs[name] = pkg
 
-        # associate :source with relevant pkgs
+    def _force_read_all_pkg_info(self):
+        if self._all_info_complete:
+            return
+
         for k, p in self._bin_pkgs.items():
+            p.read_info()
+            # associate :source with relevant pkgs
             try:
                 self._src_pkgs[p.source].binpkgs.append(p)
             except KeyError:
@@ -85,20 +89,26 @@ class Label:
                 # subpkg)
                 del self._bin_pkgs[k]
 
+        self._all_info_complete = True
+
     def get_pkgs(self):
         return self._bin_pkgs.values()
 
     def get_src_pkgs(self):
+        self._force_read_all_pkg_info()
         return self._src_pkgs.values()
 
     def get_pkg(self, name):
         '''Could raise KeyError
         '''
-        return self._bin_pkgs[name]
+        pkg = self._bin_pkgs[name]
+        pkg.read_info()
+        return pkg
 
     def get_src_pkg(self, name):
         '''Could raise KeyError
         '''
+        self._force_read_all_pkg_info()
         if not ":" in name:
             name += ":source"
         return self._src_pkgs[name]
@@ -115,6 +125,9 @@ class Install:
         self.labels = [Label(b) for b in labels]
 
     def get_pkgs(self):
+        '''Note!: returned pkgs may not have detailed info yet. Only name and
+        revision are ensured.
+        '''
         ret = []
         for b in self.labels:
             ret.extend(b.get_pkgs())
