@@ -1,4 +1,4 @@
-import os, urllib2
+import sys, os, urllib2
 from xml.etree import ElementTree
 
 def mkdir(path):
@@ -7,6 +7,9 @@ def mkdir(path):
 
 def log(msg):
     print msg
+
+def log_error(msg):
+    sys.stderr.write(msg + "\n")
 
 class Package:
     def __init__(self, xmlelement):
@@ -85,12 +88,15 @@ def refresh_components(labeldir):
         if not ("-" in fname and os.path.isfile(path)):
             continue
 
+        # each file contains the trove info of a pkg
         f = open(path)
         content = f.read()
         f.close()
 
-        xml = ElementTree.XML(content)[0] # take the first of the trovelist
+        # only take the first of the trovelist (usu. the is:x86 one)
+        xml = ElementTree.XML(content)[0]
 
+        # all components
         included = [(t.find("name").text,
                      t.find("version").find("revision").text,
                      t.get("id"))
@@ -99,7 +105,15 @@ def refresh_components(labeldir):
             f = "%s/%s-%s" % (destdir, name, revision)
             if os.path.exists(f):
                 continue
-            fetch_api_data(infolink, f)
+            try:
+                fetch_api_data(infolink, f)
+            # sometimes there is UnicodeDecodeError: 'ascii' codec can't decode
+            # byte 0xd0 in position 69: ordinal not in range(128).
+            # reported to rpath/crest: https://issues.rpath.com/browse/BUGS-469
+            except urllib2.HTTPError as e:
+                if e.code == 500 and e.readline().startswith("UnicodeDecodeError"):
+                    log_error("got UnicodeDecodeError when fetching %s-%s" % (name, revision))
+                    continue
 
 def main():
     api_site = "http://conary.foresightlinux.org/conary/api"
