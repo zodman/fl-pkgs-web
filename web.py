@@ -192,4 +192,4 @@ if __name__ == "__main__":
                     "foresight.rpath.org@fl:2-qa-kernel"]),
             }
 
-    run(host="localhost", port=8080, reloader=True)
+    run(host="localhost", port=8080)

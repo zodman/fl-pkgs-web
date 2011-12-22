@@ -57,18 +57,6 @@ def parse_pkg_list(xml):
     ret = [p for p in ret if not p.revision.startswith("0-")]
     return ret
 
-def clean_pkgs_cache(destdir, pkgs):
-    tokeep = ["%s-%s" % (p.name, p.revision) for p in pkgs]
-    cleanup_dir(destdir, tokeep)
-
-def fetch_pkg_info(pkgs, destdir):
-    '''Fetch detailed info about a pkg, from the 'trovelist' of the node
-    '''
-    for pkg in pkgs:
-        f = "%s/%s-%s" % (destdir, pkg.name, pkg.revision)
-        if not os.path.exists(f):
-            fetch_api_data(pkg.trovelist, f)
-
 def fetch_component_info(link, f):
     if os.path.exists(f):
         return
@@ -130,11 +118,17 @@ def refresh_pkg_list(api_site, label, cachedir):
     dest = "%s/%s" % (cachedir, label)
     content = fetch_api_data(api, dest)
 
-    pkgs = parse_pkg_list(content)
     destdir = "%s/%s" % (cachedir, label.split("@")[-1])
     mkdir(destdir)
-    fetch_pkg_info(pkgs, destdir)
-    clean_pkgs_cache(destdir, pkgs)
+
+    pkgs = parse_pkg_list(content)
+    for pkg in pkgs:
+        f = "%s/%s-%s" % (destdir, pkg.name, pkg.revision)
+        if not os.path.exists(f):
+            fetch_api_data(pkg.trovelist, f)
+
+    tokeep = ["%s-%s" % (p.name, p.revision) for p in pkgs]
+    cleanup_dir(destdir, tokeep)
 
 def refresh_source_list(api_site, label, cachedir):
     api = "%s/node?label=%s&type=source" % (api_site, label)
