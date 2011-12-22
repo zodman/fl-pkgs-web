@@ -1,4 +1,4 @@
-import time, json
+import os, time, json
 
 from bottle import route, run, view, abort
 
@@ -109,8 +109,9 @@ class Install:
 
     Not sure `install` is a good name.
     '''
-    def __init__(self, name, labels):
+    def __init__(self, name, description, labels):
         self.name = name
+        self.description = description
         self.labels = [Label(b) for b in labels]
 
     def get_pkgs(self):
@@ -150,46 +151,55 @@ installs = {}
 @route("/")
 @view("index")
 def index():
-    return {}
+    return dict(installs=installs.values())
 
-@route("/<inst:re:(2|2-qa)>")
+@route("/<inst:re:(stable|qa)>")
 @view("install")
 def show_install(inst):
     return dict(install=installs[inst])
 
-@route("/<inst:re:(2|2-qa)>/source")
+@route("/<inst:re:(stable|qa)>/source")
 @view("install-sources")
 def show_install_sources(inst):
     '''List :source packages
     '''
     return dict(install=installs[inst])
 
-@route("/<inst:re:(2|2-qa)>/<pkg>")
+@route("/<inst:re:(stable|qa)>/<pkg>")
 @view("pkg")
 def show_pkg(inst, pkg):
     install = installs[inst]
     return dict(install=install, pkg=install.get_pkg(pkg))
 
-@route("/<inst:re:(2|2-qa)>/<pkg>/filelist")
+@route("/<inst:re:(stable|qa)>/<pkg>/filelist")
 @view("filelist")
 def show_pkg_filelist(inst, pkg):
     install = installs[inst]
     return dict(install=install, pkg=install.get_pkg(pkg))
 
-@route("/<inst:re:(2|2-qa)>/source/<pkg>")
+@route("/<inst:re:(stable|qa)>/source/<pkg>")
 @view("srcpkg")
 def show_src_pkg(inst, pkg):
     install = installs[inst]
     return dict(install=install, src=install.get_src_pkg(pkg))
 
 if __name__ == "__main__":
-    installs = {
-            "2": Install("2", [
-                    "foresight.rpath.org@fl:2",
-                    "foresight.rpath.org@fl:2-kernel"]),
-            "2-qa": Install("2-qa", [
-                    "foresight.rpath.org@fl:2-qa",
-                    "foresight.rpath.org@fl:2-qa-kernel"]),
-            }
+    installs = {}
+    if os.path.exists("info/foresight.rpath.org@fl:2"):
+        installs["stable"] = Install("stable", "This is the stable branch of \
+                the Foresight Linux distribution. New release are usually made \
+                from this branch. However, due to various reasons, this branch \
+                hasn't been updated for a long time. Current releases are made \
+                from the QA branch.", [
+            "foresight.rpath.org@fl:2",
+            "foresight.rpath.org@fl:2-kernel"])
+    if os.path.exists("info/foresight.rpath.org@fl:2-qa"):
+        installs["qa"] = Install("qa", "This is the QA branch, which \
+                is synced frequently with the devel branch, and is meant for \
+                brave users who want to help with Foresight Linux development. \
+                For various reasons, this branch is also used for official \
+                releases.", [
+            "foresight.rpath.org@fl:2-qa",
+            "foresight.rpath.org@fl:2-qa-kernel"])
 
     run(host="localhost", port=8080)

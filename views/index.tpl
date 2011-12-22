@@ -1,6 +1,10 @@
-<p>Placeholder for some introduction<p>
-<p>Placeholder for search<p>
+<h1>Packages in Foresight Linux</h1>
 
-<p>View package lists<p>
-<p><a href="/2-qa">2-qa</a></p>
-<p><a href="/2">2</a></p>
+<h2>View package lists</h2>
+
+<dl>
+%for install in installs:
+  <dt><a href="/{{install.name}}">View the packages in the {{install.name}} branch</a></dt>
+  <dd>{{install.description}}</dd>
+%end
+</dl>
