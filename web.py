@@ -45,6 +45,7 @@ class Package:
         self.buildtime = format_buildtime(data["buildtime"])
         self.buildlog = data["buildlog"]
         self.included = data["included"]
+        self.filelist = data["filelist"]
 
         self._info_complete = True
 
@@ -166,6 +167,12 @@ def show_install_sources(inst):
 @route("/<inst:re:(2|2-qa)>/<pkg>")
 @view("pkg")
 def show_pkg(inst, pkg):
+    install = installs[inst]
+    return dict(install=install, pkg=install.get_pkg(pkg))
+
+@route("/<inst:re:(2|2-qa)>/<pkg>/filelist")
+@view("filelist")
+def show_pkg_filelist(inst, pkg):
     install = installs[inst]
     return dict(install=install, pkg=install.get_pkg(pkg))
 
