@@ -121,7 +121,9 @@ class Package:
             try:
                 self.filelist.extend(read_trove_filelist(f))
             except IOError as e:
-                # ENOENT. the component info is not cached. skip it.
+                # ENOENT. the component info is not available. skip it.
+                # Either the component can be fetched, or it's deliberatedly
+                # omitted (:debuginfo, :test etc)
                 if e.errno == 2:
                     continue
 

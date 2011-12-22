@@ -101,8 +101,7 @@ def fetch_components_for_pkg(pkgfile, destdir):
     included = [(t.find("name").text, t.get("id"))
             for t in xml.find("included").find("trovelist")]
     for trove, infolink in included:
-        if trove.endswith(":debuginfo"):
-            # skip debuginfo troves
+        if trove.endswith(":debuginfo") or trove.endswith(":test"):
             continue
         f = "%s-%s" % (trove, revision)
 
