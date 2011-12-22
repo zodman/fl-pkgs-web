@@ -206,12 +206,10 @@ class Label:
             "pkgs": [(p.name, p.revision) for p in self.get_pkgs()],
             "srcpkgs": [(p.name, p.revision) for p in self.get_src_pkgs()]}
 
-def write_info(src, dest, obj):
+def write_info(dest, obj):
     '''Put obj.to_json() to the @dest file.
-
-    @src is merely for logging here.
     '''
-    print src, "=>", dest
+    print "=>", dest
 
     f = open(dest, "w")
     json.dump(obj.to_dict(), f)
@@ -225,22 +223,19 @@ def convert():
             "foresight.rpath.org@fl:2-kernel",
             "foresight.rpath.org@fl:2-qa",
             "foresight.rpath.org@fl:2-qa-kernel"]:
-        branch = b.split("@")[-1]
-        mkdir("%s/%s" % (output, branch))
-
-        src = "%s/%s" % (cache, b)
-        dest = "%s/%s" % (output, b)
         label = Label(b, cache, read_pkg_details=False)
-        write_info(src, dest, label)
+        labeldir = "%s/%s" % (output, label.branch)
+        mkdir(labeldir)
+
+        write_info("%s/%s" % (output, b), label)
 
         for pkg in label.get_pkgs():
             f = "%s-%s" % (pkg.name, pkg.revision)
-            src = "%s/%s/%s" % (cache, branch, f)
-            dest = "%s/%s/%s"  % (output, branch, f)
+            dest = "%s/%s"  % (labeldir, f)
             if os.path.exists(dest):
                 continue
             pkg.read_info()
-            write_info(src, dest, pkg)
+            write_info(dest, pkg)
 
 if __name__ == "__main__":
     convert()
