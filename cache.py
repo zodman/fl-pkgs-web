@@ -11,6 +11,18 @@ def log(msg):
 def log_error(msg):
     sys.stderr.write(msg + "\n")
 
+def cleanup_dir(dire, tokeep):
+    '''Clean up the dir @dire, only keep files in @tokeep
+
+    Does not touch non-files.
+    '''
+    allfiles = os.listdir(dire)
+    for f in set(allfiles) - set(tokeep):
+        t = "%s/%s" % (dire, f)
+        if os.path.isfile(t):
+            log("removing %s" % t)
+            os.remove(t)
+
 class Package:
     def __init__(self, xmlelement):
         self.name = xmlelement.find("name").text
@@ -43,12 +55,7 @@ def parse_pkg_list(xml):
 
 def clean_pkgs_cache(destdir, pkgs):
     tokeep = ["%s-%s" % (p.name, p.revision) for p in pkgs]
-    allfiles = os.listdir(destdir)
-    for f in set(allfiles) - set(tokeep):
-        t = "%s/%s" % (destdir, f)
-        if os.path.isfile(t):
-            log("removing %s" % t)
-            os.remove(t)
+    cleanup_dir(destdir, tokeep)
 
 def fetch_pkg_info(pkgs, destdir):
     '''Fetch detailed info about a pkg, from the 'trovelist' of the node
@@ -57,6 +64,61 @@ def fetch_pkg_info(pkgs, destdir):
         f = "%s/%s-%s" % (destdir, pkg.name, pkg.revision)
         if not os.path.exists(f):
             fetch_api_data(pkg.trovelist, f)
+
+def fetch_component_info(link, f):
+    if os.path.exists(f):
+        return
+    try:
+        fetch_api_data(link, f)
+    # sometimes there is UnicodeDecodeError: 'ascii' codec can't decode
+    # byte 0xd0 in position 69: ordinal not in range(128).
+    # reported to rpath/crest: https://issues.rpath.com/browse/BUGS-469
+    except urllib2.HTTPError as e:
+        if e.code == 500 and e.readline().startswith("UnicodeDecodeError"):
+            log_error("got UnicodeDecodeError. NOT writing %s" % f)
+
+def fetch_components_for_pkg(pkgfile, destdir):
+    '''Take a pkg info file, and fetch its components to destdir
+
+    Return all component files that have been cached, so we can do cleanup
+    later.
+    '''
+
+    ret = []
+
+    f = open(pkgfile)
+    content = f.read()
+    f.close()
+
+    # only take the first of the trovelist (usu. the is:x86 one)
+    xml = ElementTree.XML(content)[0]
+    revision = xml.find("version").find("revision").text
+
+    included = [(t.find("name").text, t.get("id"))
+            for t in xml.find("included").find("trovelist")]
+    for trove, infolink in included:
+        if trove.endswith(":debuginfo"):
+            # skip debuginfo troves
+            continue
+        f = "%s-%s" % (trove, revision)
+
+        #### blacklist ####
+        blacklist = {
+                "fl:2": ("community-themes:data-0.13-3-2",
+                         "klavaro:data-1.2.1-1-1"),
+                "fl:2-qa": ("community-themes:data-0.13-3-3",
+                            "pitivi:locale-0.15.0-1-1",
+                            "pitivi:runtime-0.15.0-1-1"),
+                }
+        if f in blacklist.get(destdir.split("/")[-2], []):
+            print "skipping %s" % f
+            continue
+        #### end ####
+
+        ret.append(f)
+        fetch_component_info(infolink, "%s/%s" % (destdir, f))
+
+    return ret
 
 def refresh_pkg_list(api_site, label, cachedir):
     '''Fetch the list of pkgs, called 'nodes' in conary REST API.
@@ -77,10 +139,14 @@ def refresh_source_list(api_site, label, cachedir):
     fetch_api_data(api, dest)
 
 def refresh_components(labeldir):
-    '''Fetch info of components, which will have the list of files
+    '''Fetch info of components for all pkgs on a label
+
+    The components will be cached in the 'components' subdir.
     '''
     destdir = "%s/components" % labeldir
     mkdir(destdir)
+
+    tokeep = []
     for fname in os.listdir(labeldir):
         if fname.startswith("group-"):
             continue
@@ -88,32 +154,9 @@ def refresh_components(labeldir):
         if not ("-" in fname and os.path.isfile(path)):
             continue
 
-        # each file contains the trove info of a pkg
-        f = open(path)
-        content = f.read()
-        f.close()
-
-        # only take the first of the trovelist (usu. the is:x86 one)
-        xml = ElementTree.XML(content)[0]
-
-        # all components
-        included = [(t.find("name").text,
-                     t.find("version").find("revision").text,
-                     t.get("id"))
-                         for t in xml.find("included").find("trovelist")]
-        for name, revision, infolink in included:
-            f = "%s/%s-%s" % (destdir, name, revision)
-            if os.path.exists(f):
-                continue
-            try:
-                fetch_api_data(infolink, f)
-            # sometimes there is UnicodeDecodeError: 'ascii' codec can't decode
-            # byte 0xd0 in position 69: ordinal not in range(128).
-            # reported to rpath/crest: https://issues.rpath.com/browse/BUGS-469
-            except urllib2.HTTPError as e:
-                if e.code == 500 and e.readline().startswith("UnicodeDecodeError"):
-                    log_error("got UnicodeDecodeError when fetching %s-%s" % (name, revision))
-                    continue
+        comps = fetch_components_for_pkg(path, destdir)
+        tokeep.extend(comps)
+    cleanup_dir(destdir, tokeep)
 
 def main():
     api_site = "http://conary.foresightlinux.org/conary/api"
