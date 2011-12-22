@@ -24,7 +24,21 @@ def collect_component_list(xml):
     ret = [t.find("name").text for t in xml.find("trovelist")]
     return ret
 
-class TroveInfo:
+def read_trove_filelist(fname):
+    '''Read a list of file names from the <trove> info of a component, which
+    should contain a list of <fileref>
+    '''
+    f = open(fname)
+    content = f.read()
+    f.close
+
+    ret = []
+    xml = ElementTree.XML(content)
+    for fileref in xml.findall("fileref"):
+        ret.append(fileref.find("path").text)
+    return ret
+
+class TroveInfoParser:
     def __init__(self, xml):
         size = None
         source = None
@@ -62,22 +76,26 @@ class Package:
         self.name = xml.find("name").text
         self.revision = xml.find("version").find("revision").text
 
-        self.flavors = None # would be [None] if this is a no-flavor pkg
+        # list of flavor names; would be [None] if this is a no-flavor pkg
+        self.flavors = []
         self.size = None # int
         self.source = None # str
         self.buildtime = None # int; unix time
         self.buildlog = None # url
-        self.builddeps = None # list of (name, label, revision, flavor) tuples
-        self.included = None # list of (name, label, revision, flavor) tuples
+        self.builddeps = [] # list of (name, label, revision) tuples
+        self.included = [] # list of names
+        self.filelist = [] # list of files
 
-    def read_info(self):
+    def read_info(self, with_filelist=True):
         '''Read detailed information from cached data
         '''
-        subdir = self.label.branch
-        f = open("%s/%s/%s-%s" % (self.label.cache, subdir, self.name, self.revision))
+        f = open("%s/%s/%s-%s" % (self.label.cache, self.label.branch,
+            self.name, self.revision))
         content = f.read()
         f.close()
         self._parse(ElementTree.XML(content))
+        if with_filelist:
+            self._read_filelist()
 
     def _parse(self, xml):
         self.flavors = [t.find("displayflavor").text for t in xml]
@@ -85,13 +103,27 @@ class Package:
         # all troves should contain mostly same info.
         # some info is different, e.g. size/buildtime/buildlog, but for now we
         # just consider the first trove.
-        info = TroveInfo(xml[0])
+        info = TroveInfoParser(xml[0])
         self.size = info.size
         self.source = info.source
         self.buildtime = info.buildtime
         self.buildlog = info.buildlog
         self.builddeps = info.builddeps
         self.included = info.included
+
+    def _read_filelist(self):
+        '''Read filelist from components
+        '''
+        self.filelist = []
+        for trove in self.included:
+            f = "%s/%s/components/%s-%s" % (self.label.cache,
+                    self.label.branch, trove, self.revision)
+            try:
+                self.filelist.extend(read_trove_filelist(f))
+            except IOError as e:
+                # ENOENT. the component info is not cached. skip it.
+                if e.errno == 2:
+                    continue
 
     def __repr__(self):
         return "%s=%s" % (self.name, self.revision)
@@ -108,6 +140,7 @@ class Package:
             # not outputing builddeps. Not sure if it's useful.
             #"builddeps": self.builddeps,
             "included": self.included,
+            "filelist": self.filelist,
             }
 
 class SourceTrove:

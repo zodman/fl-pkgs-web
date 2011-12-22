@@ -28,7 +28,7 @@ class TestXMLConvert(unittest.TestCase):
 
     def test_read_pkg_info(self):
         pkg = test_label.get_pkg("git")
-        pkg.read_info()
+        pkg.read_info(with_filelist=False)
         self.assertEqual("git", pkg.name)
         self.assertEqual("1.7.7-1-1", pkg.revision)
         self.assertEqual(["is: x86", "is: x86_64"], pkg.flavors)
@@ -49,24 +49,29 @@ class TestXMLConvert(unittest.TestCase):
 
     def test_subpkg_has_correct_source(self):
         pkg = test_label.get_pkg("git-svn")
-        pkg.read_info()
+        pkg.read_info(with_filelist=False)
         self.assertEqual("git:source", pkg.source)
 
     def test_no_flavor_pkg(self):
         pkg = test_label.get_pkg("wqy-zenhei")
-        pkg.read_info()
+        pkg.read_info(with_filelist=False)
         self.assertEqual([None], pkg.flavors)
 
     def test_no_flavor_pkg(self):
         pkg = test_label.get_pkg("wqy-zenhei")
-        pkg.read_info()
+        pkg.read_info(with_filelist=False)
         self.assertEqual([None], pkg.flavors)
 
     def test_more_than_2_flavors(self):
         pkg = test_label.get_pkg("gnucash")
-        pkg.read_info()
+        pkg.read_info(with_filelist=False)
         self.assertEqual(["~builddocs is: x86", "~!builddocs is: x86",
             "~builddocs is: x86_64", "~!builddocs is: x86_64"], pkg.flavors)
+
+class TestFilelistParser(unittest.TestCase):
+    def test_read_filelist(self):
+        self.assertEqual(76,
+            len(convert.read_trove_filelist("datatest/git:data-1.7.7-1-1")))
 
 if __name__ == "__main__":
     unittest.main()

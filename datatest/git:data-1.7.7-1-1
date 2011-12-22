@@ -1,0 +1,575 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<trove id="http://conary.foresightlinux.org/conary/api/trove/git%3Adata%3D/foresight.rpath.org%40fl%3A2-qa/1.7.7-1-1%5Bis%3A%20x86%5D">
+  <name>git:data</name>
+  <clonedfrom>
+    <displayname>Cloned from</displayname>
+    <trovelist>
+      <trove id="http://conary.foresightlinux.org/conary/api/trove/git%3Adata%3D/foresight.rpath.org%40fl%3A2-devel/1.7.7-1-1%5Bis%3A%20x86%5D">
+        <flavor>is: x86</flavor>
+        <version>
+          <full>/foresight.rpath.org@fl:2-devel/1.7.7-1-1</full>
+          <label>foresight.rpath.org@fl:2-devel</label>
+          <ordering>0</ordering>
+          <revision>1.7.7-1-1</revision>
+        </version>
+        <name>git:data</name>
+      </trove>
+    </trovelist>
+  </clonedfrom>
+  <buildtime>1318314231</buildtime>
+  <source>
+    <displayname>Source</displayname>
+    <trovelist>
+      <trove id="http://conary.foresightlinux.org/conary/api/trove/git%3Asource%3D/foresight.rpath.org%40fl%3A2-qa/1.7.7-1%5B%5D">
+        <flavor></flavor>
+        <version>
+          <full>/foresight.rpath.org@fl:2-qa/1.7.7-1</full>
+          <label>foresight.rpath.org@fl:2-qa</label>
+          <ordering>0</ordering>
+          <revision>1.7.7-1</revision>
+        </version>
+        <name>git:source</name>
+      </trove>
+    </trovelist>
+  </source>
+  <version>
+    <full>/foresight.rpath.org@fl:2-qa/1.7.7-1-1</full>
+    <label>foresight.rpath.org@fl:2-qa</label>
+    <ordering>0</ordering>
+    <revision>1.7.7-1-1</revision>
+  </version>
+  <fileref>
+    <fileId>240167ac54e2a679f37d0a18768478afaf79afdb</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/240167ac54e2a679f37d0a18768478afaf79afdb/info?path=description"/>
+    <path>/usr/share/git-core/templates/description</path>
+    <pathId>62bb1b52c1927a246c968a9800d2f303</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.6.6.1-1-1</version>
+  </fileref>
+  <fileref>
+    <fileId>73a99fed1270875fa28bf63d9d579903c9e48b9d</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/73a99fed1270875fa28bf63d9d579903c9e48b9d/info?path=applypatch-msg.sample"/>
+    <path>/usr/share/git-core/templates/hooks/applypatch-msg.sample</path>
+    <pathId>f526c7a067e82fe329b2e699cce60294</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.6.6.1-1-1</version>
+  </fileref>
+  <fileref>
+    <fileId>7b9c50d243af808dfaf0718a5d61b4dbbfed8a76</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/7b9c50d243af808dfaf0718a5d61b4dbbfed8a76/info?path=commit-msg.sample"/>
+    <path>/usr/share/git-core/templates/hooks/commit-msg.sample</path>
+    <pathId>abb18c64af380d913b519aed5840ff24</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.7.1-1-1</version>
+  </fileref>
+  <fileref>
+    <fileId>103aa78ab4f3770348337c0f9cc203ee64e88319</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/103aa78ab4f3770348337c0f9cc203ee64e88319/info?path=post-update.sample"/>
+    <path>/usr/share/git-core/templates/hooks/post-update.sample</path>
+    <pathId>e9771c370d28fdd9727ff78cde9b3b32</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.7.1-1-1</version>
+  </fileref>
+  <fileref>
+    <fileId>89c999834deffd9c7de29f64aa54a125c6cd0a2e</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/89c999834deffd9c7de29f64aa54a125c6cd0a2e/info?path=pre-applypatch.sample"/>
+    <path>/usr/share/git-core/templates/hooks/pre-applypatch.sample</path>
+    <pathId>ca1119ac58338b54e470f5adc6cad10f</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.6.6.1-1-1</version>
+  </fileref>
+  <fileref>
+    <fileId>a768099ad86b04631a9c7b18f3d0ff32a5297365</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/a768099ad86b04631a9c7b18f3d0ff32a5297365/info?path=pre-commit.sample"/>
+    <path>/usr/share/git-core/templates/hooks/pre-commit.sample</path>
+    <pathId>299ee915f0278970cff577fdf1126748</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.7.1-1-1</version>
+  </fileref>
+  <fileref>
+    <fileId>62748ade9ebcc655fd1dbdda09b9340e8c6459b3</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/62748ade9ebcc655fd1dbdda09b9340e8c6459b3/info?path=pre-rebase.sample"/>
+    <path>/usr/share/git-core/templates/hooks/pre-rebase.sample</path>
+    <pathId>080bff209912a97492090f59ec6ec3eb</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.7.1-1-1</version>
+  </fileref>
+  <fileref>
+    <fileId>bd024208ea2396697b40888cd600315a948cdb00</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/bd024208ea2396697b40888cd600315a948cdb00/info?path=prepare-commit-msg.sample"/>
+    <path>/usr/share/git-core/templates/hooks/prepare-commit-msg.sample</path>
+    <pathId>ce0a18ceaf56022fc2e8a0343c4860df</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.7.1-1-1</version>
+  </fileref>
+  <fileref>
+    <fileId>295f431c540f1049a251f91834d70bd775d2eb7c</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/295f431c540f1049a251f91834d70bd775d2eb7c/info?path=update.sample"/>
+    <path>/usr/share/git-core/templates/hooks/update.sample</path>
+    <pathId>01c52fc09fdede3fc79222f63a067eb2</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.7.1-1-1</version>
+  </fileref>
+  <fileref>
+    <fileId>ac08ca16ecc80e0bd11bc1b82de41754eeb789ea</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/ac08ca16ecc80e0bd11bc1b82de41754eeb789ea/info?path=exclude"/>
+    <path>/usr/share/git-core/templates/info/exclude</path>
+    <pathId>b46dc14fc90835cc89a0bc2bf0131b52</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.7.1-1-1</version>
+  </fileref>
+  <fileref>
+    <fileId>30758f87d380a83a59b407d95cbefd6e4f4eb7af</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/30758f87d380a83a59b407d95cbefd6e4f4eb7af/info?path=about.tcl"/>
+    <path>/usr/share/git-gui/lib/about.tcl</path>
+    <pathId>8deddee207facb0a1065d3a921bd5d15</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.7.0-2-1</version>
+  </fileref>
+  <fileref>
+    <fileId>9345be21b4f321fd7e2434d0fe6f1dd323c4c748</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/9345be21b4f321fd7e2434d0fe6f1dd323c4c748/info?path=blame.tcl"/>
+    <path>/usr/share/git-gui/lib/blame.tcl</path>
+    <pathId>f114b5c848fd90a7ece33d8f98d348f6</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.7.3.1-1-1</version>
+  </fileref>
+  <fileref>
+    <fileId>4da5e0229191d198347c97ad754e7e35fa837515</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/4da5e0229191d198347c97ad754e7e35fa837515/info?path=branch.tcl"/>
+    <path>/usr/share/git-gui/lib/branch.tcl</path>
+    <pathId>5c3b74e66d4736eff7d7bcd11b333061</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.6.6.1-1-1</version>
+  </fileref>
+  <fileref>
+    <fileId>f9c4043b5c8000b2367b9c489d3c70830a0e5ad3</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/f9c4043b5c8000b2367b9c489d3c70830a0e5ad3/info?path=branch_checkout.tcl"/>
+    <path>/usr/share/git-gui/lib/branch_checkout.tcl</path>
+    <pathId>75503f8e3c80003556eaff3b9db90410</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.7.0-2-1</version>
+  </fileref>
+  <fileref>
+    <fileId>a24c90650f9814a830fbee42146d423258818406</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/a24c90650f9814a830fbee42146d423258818406/info?path=branch_create.tcl"/>
+    <path>/usr/share/git-gui/lib/branch_create.tcl</path>
+    <pathId>f33302924e650253854ffbefa09474a5</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.7.0-2-1</version>
+  </fileref>
+  <fileref>
+    <fileId>f8fd92b6731ffbeee082b7cf279fa112b72e0a04</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/f8fd92b6731ffbeee082b7cf279fa112b72e0a04/info?path=branch_delete.tcl"/>
+    <path>/usr/share/git-gui/lib/branch_delete.tcl</path>
+    <pathId>62b71e7c9a3638bdec4202ed62401ff4</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.7.0-2-1</version>
+  </fileref>
+  <fileref>
+    <fileId>d4ae865481ab96cca4e0355908468cdc8664df86</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/d4ae865481ab96cca4e0355908468cdc8664df86/info?path=branch_rename.tcl"/>
+    <path>/usr/share/git-gui/lib/branch_rename.tcl</path>
+    <pathId>770092a8d82c0e7cc68fddd0ec21441e</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.7.5.1-1-1</version>
+  </fileref>
+  <fileref>
+    <fileId>d1bcf470542a5771758a2b391b2d8e8b39e9e494</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/d1bcf470542a5771758a2b391b2d8e8b39e9e494/info?path=browser.tcl"/>
+    <path>/usr/share/git-gui/lib/browser.tcl</path>
+    <pathId>b97ea6f0012bd0692d544a75094e8870</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.7.5.1-1-1</version>
+  </fileref>
+  <fileref>
+    <fileId>ca52b305f0ad9ba197c14f51f2fd8ff2ed7a6a8b</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/ca52b305f0ad9ba197c14f51f2fd8ff2ed7a6a8b/info?path=checkout_op.tcl"/>
+    <path>/usr/share/git-gui/lib/checkout_op.tcl</path>
+    <pathId>0616d8994ca3e960ef4630a88d6b8067</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.6.6.1-1-1</version>
+  </fileref>
+  <fileref>
+    <fileId>ea76d5d1c84c3010d87adf83ac8e176c561b4d35</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/ea76d5d1c84c3010d87adf83ac8e176c561b4d35/info?path=choose_font.tcl"/>
+    <path>/usr/share/git-gui/lib/choose_font.tcl</path>
+    <pathId>bd3e37a3ab9fb76fd6c3d8b3be8acf79</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.7.0-2-1</version>
+  </fileref>
+  <fileref>
+    <fileId>4db32610776704c28391ab56319cdae4e6a37ad0</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/4db32610776704c28391ab56319cdae4e6a37ad0/info?path=choose_repository.tcl"/>
+    <path>/usr/share/git-gui/lib/choose_repository.tcl</path>
+    <pathId>c4fa524a720efdd423629e49a5663d6f</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.7.5.1-1-1</version>
+  </fileref>
+  <fileref>
+    <fileId>d847ac5fab937ffa33fd96e85351ab90aba099ba</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/d847ac5fab937ffa33fd96e85351ab90aba099ba/info?path=choose_rev.tcl"/>
+    <path>/usr/share/git-gui/lib/choose_rev.tcl</path>
+    <pathId>f2d843c5cb2ca354d5379d1a6723de5d</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.7.0-2-1</version>
+  </fileref>
+  <fileref>
+    <fileId>fe9d97efd4edd2c963d1028d2e912db27ae56a88</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/fe9d97efd4edd2c963d1028d2e912db27ae56a88/info?path=class.tcl"/>
+    <path>/usr/share/git-gui/lib/class.tcl</path>
+    <pathId>fbd847eea778a384d56d7a5e3fb3104a</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.7.0-2-1</version>
+  </fileref>
+  <fileref>
+    <fileId>ab6bd3ef1dd95305cd339121260161b6c2fb552d</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/ab6bd3ef1dd95305cd339121260161b6c2fb552d/info?path=commit.tcl"/>
+    <path>/usr/share/git-gui/lib/commit.tcl</path>
+    <pathId>defceb4cc3c59c3ec675989fca42eab1</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.7.5.1-1-1</version>
+  </fileref>
+  <fileref>
+    <fileId>c3182651921b664e08813b08effd98f569abd49f</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/c3182651921b664e08813b08effd98f569abd49f/info?path=console.tcl"/>
+    <path>/usr/share/git-gui/lib/console.tcl</path>
+    <pathId>c68ca4cdb0c4af4adf9f2a5be07e65ba</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.7.0-2-1</version>
+  </fileref>
+  <fileref>
+    <fileId>5d33dbfda99b9095054e71dc4417ccde051b626c</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/5d33dbfda99b9095054e71dc4417ccde051b626c/info?path=database.tcl"/>
+    <path>/usr/share/git-gui/lib/database.tcl</path>
+    <pathId>99102f8b43ac52285ec82c69fd4adc7b</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.7.0-2-1</version>
+  </fileref>
+  <fileref>
+    <fileId>bf2905064294b633dcabec072619fea225e39c77</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/bf2905064294b633dcabec072619fea225e39c77/info?path=date.tcl"/>
+    <path>/usr/share/git-gui/lib/date.tcl</path>
+    <pathId>26ef5c1145f702e62fecc26f8624a361</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.6.6.1-1-1</version>
+  </fileref>
+  <fileref>
+    <fileId>5e54a32e9a53e46d61d9466a361728030afcbe40</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/5e54a32e9a53e46d61d9466a361728030afcbe40/info?path=diff.tcl"/>
+    <path>/usr/share/git-gui/lib/diff.tcl</path>
+    <pathId>c658d766d9829a0d40332ad8052b1f83</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.7.5.1-1-1</version>
+  </fileref>
+  <fileref>
+    <fileId>a9629d0ce2f52d5a21dad110c690e09e28330e24</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/a9629d0ce2f52d5a21dad110c690e09e28330e24/info?path=encoding.tcl"/>
+    <path>/usr/share/git-gui/lib/encoding.tcl</path>
+    <pathId>333b7a74693fb9dd3ba68a51bc9804ae</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.6.6.1-1-1</version>
+  </fileref>
+  <fileref>
+    <fileId>45790b66e5a885bda4b681eece76ba5e9ec8d144</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/45790b66e5a885bda4b681eece76ba5e9ec8d144/info?path=error.tcl"/>
+    <path>/usr/share/git-gui/lib/error.tcl</path>
+    <pathId>46b32c34b1be5707852c413906aced10</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.7.0-2-1</version>
+  </fileref>
+  <fileref>
+    <fileId>7d8a314cede8f981c4e8f563f15f30988354c8a8</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/7d8a314cede8f981c4e8f563f15f30988354c8a8/info?path=git-gui.ico"/>
+    <path>/usr/share/git-gui/lib/git-gui.ico</path>
+    <pathId>29a9e1c893d4774fe0861e9947b54bbb</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.6.6.1-1-1</version>
+  </fileref>
+  <fileref>
+    <fileId>250493858443494c67f13d03ce2c8b93626dea76</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/250493858443494c67f13d03ce2c8b93626dea76/info?path=index.tcl"/>
+    <path>/usr/share/git-gui/lib/index.tcl</path>
+    <pathId>2fbbebda54d43727cb481dc28b510b3f</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.7.5.1-1-1</version>
+  </fileref>
+  <fileref>
+    <fileId>77667ce3aacf42af7d4aa4367e5787a1be6ab8f8</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/77667ce3aacf42af7d4aa4367e5787a1be6ab8f8/info?path=logo.tcl"/>
+    <path>/usr/share/git-gui/lib/logo.tcl</path>
+    <pathId>870389f936d72c1a46f09b3e0c71b986</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.6.6.1-1-1</version>
+  </fileref>
+  <fileref>
+    <fileId>e2e1f3a5b6262b537385c032d92e9c26ddba5a6d</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/e2e1f3a5b6262b537385c032d92e9c26ddba5a6d/info?path=merge.tcl"/>
+    <path>/usr/share/git-gui/lib/merge.tcl</path>
+    <pathId>f9e7e8f4f80a4bb1ccdcf817d3e9aaef</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.7.5.1-1-1</version>
+  </fileref>
+  <fileref>
+    <fileId>bf55bc110140f2201b223e9820222fe77f466870</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/bf55bc110140f2201b223e9820222fe77f466870/info?path=mergetool.tcl"/>
+    <path>/usr/share/git-gui/lib/mergetool.tcl</path>
+    <pathId>a85f02e37255d6562d2d45c087349be4</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.7.5.1-1-1</version>
+  </fileref>
+  <fileref>
+    <fileId>46ffabaa683cf38e5093a9effe320648b2961f74</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/46ffabaa683cf38e5093a9effe320648b2961f74/info?path=option.tcl"/>
+    <path>/usr/share/git-gui/lib/option.tcl</path>
+    <pathId>5af2ab5019996b437853db13b07a4fe0</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.7.2.2-1-1</version>
+  </fileref>
+  <fileref>
+    <fileId>7de16e25f034d40f5af55589b103855177d640c2</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/7de16e25f034d40f5af55589b103855177d640c2/info?path=remote.tcl"/>
+    <path>/usr/share/git-gui/lib/remote.tcl</path>
+    <pathId>2d4272e781d6751399e12476c23a2997</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.7.5.1-1-1</version>
+  </fileref>
+  <fileref>
+    <fileId>faed6f8442949508b5169918c3966226ac74b143</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/faed6f8442949508b5169918c3966226ac74b143/info?path=remote_add.tcl"/>
+    <path>/usr/share/git-gui/lib/remote_add.tcl</path>
+    <pathId>6d573e0fd8234dd197d9ef47ea1c33c6</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.7.0-2-1</version>
+  </fileref>
+  <fileref>
+    <fileId>b5d061a14e604c612df2d14574b1aba5d4d44c6e</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/b5d061a14e604c612df2d14574b1aba5d4d44c6e/info?path=remote_branch_delete.tcl"/>
+    <path>/usr/share/git-gui/lib/remote_branch_delete.tcl</path>
+    <pathId>5cee5629e870f552e671e1422f31a9c6</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.7.5.1-1-1</version>
+  </fileref>
+  <fileref>
+    <fileId>cf50087abdfd6d33ebb0bddb63e80a6bda8dc595</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/cf50087abdfd6d33ebb0bddb63e80a6bda8dc595/info?path=search.tcl"/>
+    <path>/usr/share/git-gui/lib/search.tcl</path>
+    <pathId>4bc7db8347ea002cb2ede4b8ef57d506</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.7.0-2-1</version>
+  </fileref>
+  <fileref>
+    <fileId>ac10f884efd7518b929ceb59cfa3f9c114ae9c24</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/ac10f884efd7518b929ceb59cfa3f9c114ae9c24/info?path=shortcut.tcl"/>
+    <path>/usr/share/git-gui/lib/shortcut.tcl</path>
+    <pathId>87254fae1e7a5fcf5745c57a4f130005</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.7.2.2-1-1</version>
+  </fileref>
+  <fileref>
+    <fileId>bb0ac4ffb62a070ca81509c081de3659d17d4c5d</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/bb0ac4ffb62a070ca81509c081de3659d17d4c5d/info?path=spellcheck.tcl"/>
+    <path>/usr/share/git-gui/lib/spellcheck.tcl</path>
+    <pathId>d68648e03804683ede61e9291a511dca</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.6.6.1-1-1</version>
+  </fileref>
+  <fileref>
+    <fileId>5292da901b35f3fb2bd060a6ecda669d704bbb05</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/5292da901b35f3fb2bd060a6ecda669d704bbb05/info?path=sshkey.tcl"/>
+    <path>/usr/share/git-gui/lib/sshkey.tcl</path>
+    <pathId>ca369ca93c6bc6a38c57a3b3ac419818</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.7.0-2-1</version>
+  </fileref>
+  <fileref>
+    <fileId>519b3ec8d37224a5c4896ab0d94fc28a29891a59</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/519b3ec8d37224a5c4896ab0d94fc28a29891a59/info?path=status_bar.tcl"/>
+    <path>/usr/share/git-gui/lib/status_bar.tcl</path>
+    <pathId>bc8a9e7aa85db5ad013aef5eaf50b605</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.7.2.2-1-1</version>
+  </fileref>
+  <fileref>
+    <fileId>4bff00923f7551cee4c7a47bc943b3d514493075</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/4bff00923f7551cee4c7a47bc943b3d514493075/info?path=tclIndex"/>
+    <path>/usr/share/git-gui/lib/tclIndex</path>
+    <pathId>00f21ddbcd52ab5f9db3aa906d3b4741</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.7.7-1-1</version>
+  </fileref>
+  <fileref>
+    <fileId>1025359418a979b72c4a63440911dacb5949580a</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/1025359418a979b72c4a63440911dacb5949580a/info?path=themed.tcl"/>
+    <path>/usr/share/git-gui/lib/themed.tcl</path>
+    <pathId>bbab53f9d90817573290bb1aff6a5c77</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.7.0-2-1</version>
+  </fileref>
+  <fileref>
+    <fileId>b9341d9a43e23ab8e840224998bee68eb148e74e</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/b9341d9a43e23ab8e840224998bee68eb148e74e/info?path=tools.tcl"/>
+    <path>/usr/share/git-gui/lib/tools.tcl</path>
+    <pathId>e477d8d367a770ffceb6890c65d2ceed</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.6.6.1-1-1</version>
+  </fileref>
+  <fileref>
+    <fileId>e87709bb47ea2451168efad5c3b711585a9edcc4</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/e87709bb47ea2451168efad5c3b711585a9edcc4/info?path=tools_dlg.tcl"/>
+    <path>/usr/share/git-gui/lib/tools_dlg.tcl</path>
+    <pathId>4ea71f9f6861a794391692f267930efb</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.7.0-2-1</version>
+  </fileref>
+  <fileref>
+    <fileId>df6d161abea9dafcd1603b914618da9dd90078e3</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/df6d161abea9dafcd1603b914618da9dd90078e3/info?path=transport.tcl"/>
+    <path>/usr/share/git-gui/lib/transport.tcl</path>
+    <pathId>f2f400d709d835f3c73ca07a8dbc0a7f</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.7.5.1-1-1</version>
+  </fileref>
+  <fileref>
+    <fileId>4c82efbb7aa06fe3f00ade43fac663c00caeb604</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/4c82efbb7aa06fe3f00ade43fac663c00caeb604/info?path=win32.tcl"/>
+    <path>/usr/share/git-gui/lib/win32.tcl</path>
+    <pathId>6f970c72034887ae596693890ab5c2dc</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.7.2.2-1-1</version>
+  </fileref>
+  <fileref>
+    <fileId>6d30ea0f5795471919411c2950497838f51c4bd9</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/6d30ea0f5795471919411c2950497838f51c4bd9/info?path=win32_shortcut.js"/>
+    <path>/usr/share/git-gui/lib/win32_shortcut.js</path>
+    <pathId>2b40012fcc19d31a2e5c09929a04d7a9</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.6.6.1-1-1</version>
+  </fileref>
+  <fileref>
+    <fileId>d0c3c641a7b2072f72f6b158d832091e1516ed68</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/d0c3c641a7b2072f72f6b158d832091e1516ed68/info?path=de.msg"/>
+    <path>/usr/share/git-gui/lib/msgs/de.msg</path>
+    <pathId>b31bfdeb3cb90b2c6bccfca082c74bab</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.7.0-2-1</version>
+  </fileref>
+  <fileref>
+    <fileId>a2fbd89dc618464ec51c41f6e301efbe58114db7</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/a2fbd89dc618464ec51c41f6e301efbe58114db7/info?path=el.msg"/>
+    <path>/usr/share/git-gui/lib/msgs/el.msg</path>
+    <pathId>3d02ffd86c0b28c46e79351193fe5eb5</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.6.6.1-1-1</version>
+  </fileref>
+  <fileref>
+    <fileId>5c5c4db20dd08aae9eb5930eee72121bc61faa33</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/5c5c4db20dd08aae9eb5930eee72121bc61faa33/info?path=fr.msg"/>
+    <path>/usr/share/git-gui/lib/msgs/fr.msg</path>
+    <pathId>6cd71e6f09ebc0b1082e10e272446419</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.7.0-2-1</version>
+  </fileref>
+  <fileref>
+    <fileId>edca18b741dc14ac27e42dc594007bd08568b1d8</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/edca18b741dc14ac27e42dc594007bd08568b1d8/info?path=hu.msg"/>
+    <path>/usr/share/git-gui/lib/msgs/hu.msg</path>
+    <pathId>64a1b1a31205cdc5de2c1d78c1291de7</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.6.6.1-1-1</version>
+  </fileref>
+  <fileref>
+    <fileId>586fd7ff8cbe678fc62b41d44772b4050c72b85d</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/586fd7ff8cbe678fc62b41d44772b4050c72b85d/info?path=it.msg"/>
+    <path>/usr/share/git-gui/lib/msgs/it.msg</path>
+    <pathId>71d080e5a911ca39a8ab0f41055d66dd</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.7.0-2-1</version>
+  </fileref>
+  <fileref>
+    <fileId>98ea5e9130cd842b8f3f42c80893cc7daf212525</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/98ea5e9130cd842b8f3f42c80893cc7daf212525/info?path=ja.msg"/>
+    <path>/usr/share/git-gui/lib/msgs/ja.msg</path>
+    <pathId>8d6a5b07f82bb12655591480fa0fe61d</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.7.0-2-1</version>
+  </fileref>
+  <fileref>
+    <fileId>fe736ea781bfdab63161a31d88d43d4d00811c3b</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/fe736ea781bfdab63161a31d88d43d4d00811c3b/info?path=nb.msg"/>
+    <path>/usr/share/git-gui/lib/msgs/nb.msg</path>
+    <pathId>2885c3e91f98f45ee95389d959d04f11</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.6.6.1-1-1</version>
+  </fileref>
+  <fileref>
+    <fileId>103408872a8333f326c1c5c3f3a3782b2a811426</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/103408872a8333f326c1c5c3f3a3782b2a811426/info?path=pt_br.msg"/>
+    <path>/usr/share/git-gui/lib/msgs/pt_br.msg</path>
+    <pathId>59fe25838a2393954d526c6433bc0d65</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.7.5.1-1-1</version>
+  </fileref>
+  <fileref>
+    <fileId>9554b717cd48dbbf48af19125b9f99880bc3c307</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/9554b717cd48dbbf48af19125b9f99880bc3c307/info?path=ru.msg"/>
+    <path>/usr/share/git-gui/lib/msgs/ru.msg</path>
+    <pathId>1cebf329f7496840a21fdbc8193d52e5</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.7.5.1-1-1</version>
+  </fileref>
+  <fileref>
+    <fileId>1213c8ba963e07d8de7436dea5d8a45462546f2c</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/1213c8ba963e07d8de7436dea5d8a45462546f2c/info?path=sv.msg"/>
+    <path>/usr/share/git-gui/lib/msgs/sv.msg</path>
+    <pathId>79289964be331c0f9d8edae49181a52a</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.7.3.1-1-1</version>
+  </fileref>
+  <fileref>
+    <fileId>1fd5879d22bd241d20b482350b0b089a9c4a23a2</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/1fd5879d22bd241d20b482350b0b089a9c4a23a2/info?path=zh_cn.msg"/>
+    <path>/usr/share/git-gui/lib/msgs/zh_cn.msg</path>
+    <pathId>f2b7078b41cfdbdc5ad12969b5ff0351</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.6.6.1-1-1</version>
+  </fileref>
+  <fileref>
+    <fileId>02cb2d49c57528c07273da45e4713bfb9667c584</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/02cb2d49c57528c07273da45e4713bfb9667c584/info?path=de.msg"/>
+    <path>/usr/share/gitk/lib/msgs/de.msg</path>
+    <pathId>f630248eee0c3a92e95ce74ea47778a4</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.7.1-1-1</version>
+  </fileref>
+  <fileref>
+    <fileId>5c1d62823fbf354c33a3ea41f7685c1e80f5820f</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/5c1d62823fbf354c33a3ea41f7685c1e80f5820f/info?path=es.msg"/>
+    <path>/usr/share/gitk/lib/msgs/es.msg</path>
+    <pathId>321e0d2fafa369f47e179c58c62b8b6b</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.7.1-1-1</version>
+  </fileref>
+  <fileref>
+    <fileId>2fafbdfa62bc9f1103f134c1b38f365a79e25a3b</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/2fafbdfa62bc9f1103f134c1b38f365a79e25a3b/info?path=fr.msg"/>
+    <path>/usr/share/gitk/lib/msgs/fr.msg</path>
+    <pathId>e42987012680ae4681fc8a4b8c4f865f</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.7.1-1-1</version>
+  </fileref>
+  <fileref>
+    <fileId>148d09e5d1ab7a8fb9962ee74f15b2deba6ed720</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/148d09e5d1ab7a8fb9962ee74f15b2deba6ed720/info?path=hu.msg"/>
+    <path>/usr/share/gitk/lib/msgs/hu.msg</path>
+    <pathId>260859f2b382a44e6d941c27e1b2433d</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.7.1-1-1</version>
+  </fileref>
+  <fileref>
+    <fileId>ca11df5f4b6c49f1be023d5cf838b6ae9cb603e1</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/ca11df5f4b6c49f1be023d5cf838b6ae9cb603e1/info?path=it.msg"/>
+    <path>/usr/share/gitk/lib/msgs/it.msg</path>
+    <pathId>00f0a987753974359b20777f50d8a1ba</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.7.1-1-1</version>
+  </fileref>
+  <fileref>
+    <fileId>90a94559fd4f5af601ebef1bbbc6cbf82e5bbb6e</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/90a94559fd4f5af601ebef1bbbc6cbf82e5bbb6e/info?path=ja.msg"/>
+    <path>/usr/share/gitk/lib/msgs/ja.msg</path>
+    <pathId>5afbe07c83ac55d560d2ce2f72fd63fa</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.7.1-1-1</version>
+  </fileref>
+  <fileref>
+    <fileId>a76b8bc7536621cea21647f2223ead20aa5224c2</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/a76b8bc7536621cea21647f2223ead20aa5224c2/info?path=pt_br.msg"/>
+    <path>/usr/share/gitk/lib/msgs/pt_br.msg</path>
+    <pathId>5445d8eda23191b4677b7024832607e6</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.7.5.1-1-1</version>
+  </fileref>
+  <fileref>
+    <fileId>d9af3f33b0202a7f90bb558353254a94133cd495</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/d9af3f33b0202a7f90bb558353254a94133cd495/info?path=ru.msg"/>
+    <path>/usr/share/gitk/lib/msgs/ru.msg</path>
+    <pathId>f14d2b07f60f80489e59f1d76b21f7b1</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.7.5.1-1-1</version>
+  </fileref>
+  <fileref>
+    <fileId>e969ad5ec45a847a8ed41708615a7426e16f50d1</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/e969ad5ec45a847a8ed41708615a7426e16f50d1/info?path=sv.msg"/>
+    <path>/usr/share/gitk/lib/msgs/sv.msg</path>
+    <pathId>c349ce91b848f06d27a9177bc78f0664</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.7.5.1-1-1</version>
+  </fileref>
+  <fileref>
+    <fileId>0d98c31448c190c20eeb9fae585295d2c8781d87</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/0d98c31448c190c20eeb9fae585295d2c8781d87/info?path=gitweb.cgi"/>
+    <path>/usr/share/gitweb/gitweb.cgi</path>
+    <pathId>5f126e4a9a547a8c107847c641a8f994</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.7.7-1-1</version>
+  </fileref>
+  <fileref>
+    <fileId>2fe8e266f597762b05c484395a41a80f53a33653</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/2fe8e266f597762b05c484395a41a80f53a33653/info?path=git-favicon.png"/>
+    <path>/usr/share/gitweb/static/git-favicon.png</path>
+    <pathId>470e278754d75102a6dc54d443390495</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.7.2.2-1-1</version>
+  </fileref>
+  <fileref>
+    <fileId>51cccf876d1e34ab0babbfa42f05d2800249a532</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/51cccf876d1e34ab0babbfa42f05d2800249a532/info?path=git-logo.png"/>
+    <path>/usr/share/gitweb/static/git-logo.png</path>
+    <pathId>b374262b5225de8d15604030c0602300</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.7.2.2-1-1</version>
+  </fileref>
+  <fileref>
+    <fileId>1055da87f7f4d6b1ce7d5a9234764c4180bd84b7</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/1055da87f7f4d6b1ce7d5a9234764c4180bd84b7/info?path=gitweb.css"/>
+    <path>/usr/share/gitweb/static/gitweb.css</path>
+    <pathId>2504bda2f86b6bc8ed97be62e2e49c6c</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.7.7-1-1</version>
+  </fileref>
+  <fileref>
+    <fileId>b19b749919d3fafd8328ebb2fd02b954f7e94899</fileId>
+    <inode id="http://conary.foresightlinux.org/conary/api/file/b19b749919d3fafd8328ebb2fd02b954f7e94899/info?path=gitweb.js"/>
+    <path>/usr/share/gitweb/static/gitweb.js</path>
+    <pathId>6b1e9c8f05553e3f4cc94802fbe77dbc</pathId>
+    <version>/foresight.rpath.org@fl:2-qa/1.7.7-1-1</version>
+  </fileref>
+  <flavor>is: x86</flavor>
+  <size>1506735</size>
+</trove>
