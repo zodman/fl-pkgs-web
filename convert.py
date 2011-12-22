@@ -1,5 +1,5 @@
 import os, json
-from xml.etree import ElementTree
+from lxml import etree
 
 def mkdir(path):
     if not os.path.exists(path):
@@ -33,7 +33,7 @@ def read_trove_filelist(fname):
     f.close
 
     ret = []
-    xml = ElementTree.XML(content)
+    xml = etree.XML(content)
     for fileref in xml.findall("fileref"):
         ret.append(fileref.find("path").text)
     return ret
@@ -93,7 +93,7 @@ class Package:
             self.name, self.revision))
         content = f.read()
         f.close()
-        self._parse(ElementTree.XML(content))
+        self._parse(etree.XML(content))
         if with_filelist:
             self._read_filelist()
 
@@ -171,7 +171,7 @@ class Label:
         content = f.read()
         f.close()
 
-        for e in ElementTree.XML(content):
+        for e in etree.XML(content):
             pkg = Package(e, self)
             if pkg.revision.startswith("0-"):
                 continue
@@ -186,7 +186,7 @@ class Label:
         content = f.read()
         f.close()
 
-        for e in ElementTree.XML(content):
+        for e in etree.XML(content):
             pkg = SourceTrove(e)
             if pkg.revision.startswith("0-"):
                 continue

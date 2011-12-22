@@ -1,5 +1,9 @@
 import sys, os, urllib2
-from xml.etree import ElementTree
+# running a do-nothing refresh of components:
+# lxml takes 0m56.850s.
+# cElementTree takes 1m2.269s.
+# ElepentTree takes forever (>10m)
+from lxml import etree
 
 def mkdir(path):
     if not os.path.exists(path):
@@ -48,7 +52,7 @@ def fetch_api_data(api, dest):
 def parse_pkg_list(xml):
     '''Read a <nodelist> and return a list of pkgs contained within
     '''
-    ret = [Package(e) for e in ElementTree.XML(xml)]
+    ret = [Package(e) for e in etree.XML(xml)]
     # drop nil pkgs
     ret = [p for p in ret if not p.revision.startswith("0-")]
     return ret
@@ -91,7 +95,7 @@ def fetch_components_for_pkg(pkgfile, destdir):
     f.close()
 
     # only take the first of the trovelist (usu. the is:x86 one)
-    xml = ElementTree.XML(content)[0]
+    xml = etree.XML(content)[0]
     revision = xml.find("version").find("revision").text
 
     included = [(t.find("name").text, t.get("id"))
@@ -111,7 +115,7 @@ def fetch_components_for_pkg(pkgfile, destdir):
                             "pitivi:runtime-0.15.0-1-1"),
                 }
         if f in blacklist.get(destdir.split("/")[-2], []):
-            print "skipping %s" % f
+            log_error("skipping %s" % f)
             continue
         #### end ####
 
