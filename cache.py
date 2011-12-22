@@ -43,8 +43,9 @@ def clean_pkgs_cache(destdir, pkgs):
     allfiles = os.listdir(destdir)
     for f in set(allfiles) - set(tokeep):
         t = "%s/%s" % (destdir, f)
-        log("removing %s" % t)
-        os.remove(t)
+        if os.path.isfile(t):
+            log("removing %s" % t)
+            os.remove(t)
 
 def fetch_pkg_info(pkgs, destdir):
     '''Fetch detailed info about a pkg, from the 'trovelist' of the node
