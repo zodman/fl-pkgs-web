@@ -4,7 +4,8 @@
 
 <dl>
 %for install in installs:
-  <dt><a href="/{{install.name}}">View the packages in the {{install.name}} branch</a></dt>
+  <dt><a href="/{{install.name}}">View the packages in the {{install.name}} branch</a>
+    (<a href="/{{install.name}}/source">view source packages</a>)</dt>
   <dd>{{install.description}}</dd>
 %end
 </dl>
