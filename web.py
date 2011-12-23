@@ -1,4 +1,4 @@
-import time, json
+import os, time, json
 
 from bottle import route, run, view, abort, request, redirect
 
@@ -238,4 +238,4 @@ if __name__ == "__main__":
         "foresight.rpath.org@fl:2-qa",
         "foresight.rpath.org@fl:2-qa-kernel"])
 
-    run(host="localhost", port=8080)
+    run(server='gevent', host="0.0.0.0", port=int(os.environ.get('PORT', 5000)))
