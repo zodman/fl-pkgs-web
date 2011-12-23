@@ -190,6 +190,7 @@ def show_src_pkg(inst, pkg):
 @route("/search/<keyword>")
 @view("searchpkg")
 def search_pkg(keyword):
+    keyword = keyword.decode("utf8")
     branch = request.query.branch
     if not branch or branch not in installs:
         branch = "qa"
@@ -200,6 +201,7 @@ def search_pkg(keyword):
 @route("/search/file/<keyword>")
 @view("searchfile")
 def search_file(keyword):
+    keyword = keyword.decode("utf8")
     branch = request.query.branch
     if not branch or branch not in installs:
         branch = "qa"
@@ -215,9 +217,9 @@ def receive_search():
         query = "&branch=%s" % b
 
     if request.forms.searchtype == "file":
-        redirect("/search/file/%s%s" % (request.forms.keyword, query))
+        redirect("/search/file/%s%s" % (request.forms.keyword.encode("utf8"), query))
     else:
-        redirect("/search/%s%s" % (request.forms.keyword, query))
+        redirect("/search/%s%s" % (request.forms.keyword.encode("utf8"), query))
 
 if __name__ == "__main__":
     installs = {}
