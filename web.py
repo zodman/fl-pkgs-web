@@ -24,20 +24,9 @@ class SourceTrove:
         self.binpkgs = []
 
 class Package:
-    def __init__(self, name, revision, label):
-        self.name = name
-        self.revision = revision
-        self.label = label
-
-        self._info_complete = False
-
-    def read_info(self):
-        if self._info_complete:
-            return
-
-        branch = self.label.branch
-        f = open("info/%s/%s-%s" % (branch, self.name, self.revision))
-        data = json.load(f)
+    def __init__(self, data):
+        self.name = data["name"]
+        self.revision = data["revision"]
 
         self.flavors = format_flavors(data["flavors"])
         self.size = format_size(data["size"])
@@ -46,8 +35,6 @@ class Package:
         self.buildlog = data["buildlog"]
         self.included = data["included"]
         self.filelist = data["filelist"]
-
-        self._info_complete = True
 
 class Label:
     def __init__(self, label):
@@ -65,21 +52,16 @@ class Label:
         f.close()
 
         # read binary packages
-        for name, revision in data["pkgs"]:
-            pkg = Package(name, revision, self)
-            self._bin_pkgs[name] = pkg
+        for pkgdata in data["pkgs"]:
+            pkg = Package(pkgdata)
+            self._bin_pkgs[pkg.name] = pkg
 
         # read src packages
         for name, revision in data["srcpkgs"]:
             pkg = SourceTrove(name, revision)
             self._src_pkgs[name] = pkg
 
-    def _force_read_all_pkg_info(self):
-        if self._all_info_complete:
-            return
-
         for k, p in self._bin_pkgs.items():
-            p.read_info()
             # associate :source with relevant pkgs
             try:
                 self._src_pkgs[p.source].binpkgs.append(p)
@@ -89,26 +71,21 @@ class Label:
                 # subpkg)
                 del self._bin_pkgs[k]
 
-        self._all_info_complete = True
-
     def get_pkgs(self):
         return self._bin_pkgs.values()
 
     def get_src_pkgs(self):
-        self._force_read_all_pkg_info()
         return self._src_pkgs.values()
 
     def get_pkg(self, name):
         '''Could raise KeyError
         '''
         pkg = self._bin_pkgs[name]
-        pkg.read_info()
         return pkg
 
     def get_src_pkg(self, name):
         '''Could raise KeyError
         '''
-        self._force_read_all_pkg_info()
         if not ":" in name:
             name += ":source"
         return self._src_pkgs[name]

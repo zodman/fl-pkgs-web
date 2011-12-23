@@ -205,39 +205,28 @@ class Label:
 
     def to_dict(self):
         return {
-            "pkgs": [(p.name, p.revision) for p in self.get_pkgs()],
+            "pkgs": [pkg.to_dict() for pkg in self.get_pkgs()],
             "srcpkgs": [(p.name, p.revision) for p in self.get_src_pkgs()]}
 
 def write_info(dest, obj):
-    '''Put obj.to_json() to the @dest file.
-    '''
     print "=>", dest
 
     f = open(dest, "w")
-    json.dump(obj.to_dict(), f)
+    json.dump(obj, f)
     f.close()
 
 def convert():
     cache = "rawdata"
     output = "info"
+    mkdir(output)
     for b in [
             "foresight.rpath.org@fl:2",
             "foresight.rpath.org@fl:2-kernel",
             "foresight.rpath.org@fl:2-qa",
-            "foresight.rpath.org@fl:2-qa-kernel"]:
-        label = Label(b, cache, read_pkg_details=False)
-        labeldir = "%s/%s" % (output, label.branch)
-        mkdir(labeldir)
-
-        write_info("%s/%s" % (output, b), label)
-
-        for pkg in label.get_pkgs():
-            f = "%s-%s" % (pkg.name, pkg.revision)
-            dest = "%s/%s"  % (labeldir, f)
-            if os.path.exists(dest):
-                continue
-            pkg.read_info()
-            write_info(dest, pkg)
+            "foresight.rpath.org@fl:2-qa-kernel",
+            ]:
+        label = Label(b, cache)
+        write_info("%s/%s" % (output, b), label.to_dict())
 
 if __name__ == "__main__":
     convert()
