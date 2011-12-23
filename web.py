@@ -198,7 +198,7 @@ def search_pkg(keyword):
     pkgs = install.search_pkg(keyword)
     return dict(install=install, pkgs=pkgs)
 
-@route("/search/file/<keyword>")
+@route("/search/file/<keyword:path>")
 @view("searchfile")
 def search_file(keyword):
     keyword = keyword.decode("utf8")
