@@ -1,6 +1,6 @@
 import os, time, json
 
-from bottle import route, run, view, abort
+from bottle import route, run, view, abort, request
 
 def format_size(size):
     if size < 1000:
@@ -101,21 +101,23 @@ class Install:
         self.description = description
         self.labels = [Label(b) for b in labels]
 
-    def get_pkgs(self):
+    def get_pkgs(self, sort=True):
         '''Note!: returned pkgs may not have detailed info yet. Only name and
         revision are ensured.
         '''
         ret = []
         for b in self.labels:
             ret.extend(b.get_pkgs())
-        ret.sort(key=lambda p: p.name)
+        if sort:
+            ret.sort(key=lambda p: p.name)
         return ret
 
-    def get_src_pkgs(self):
+    def get_src_pkgs(self, sort=True):
         ret = []
         for b in self.labels:
             ret.extend(b.get_src_pkgs())
-        ret.sort(key=lambda p: p.name)
+        if sort:
+            ret.sort(key=lambda p: p.name)
         return ret
 
     def get_pkg(self, name):
@@ -135,6 +137,13 @@ class Install:
             except KeyError:
                 continue
         abort(404, "No such page")
+
+    def search_pkg(self, keyword):
+        ret = [pkg for pkg in self.get_pkgs(sort=False) +
+                              self.get_src_pkgs(sort=False)
+                if keyword in pkg.name]
+        ret.sort(key=lambda pkg: pkg.name)
+        return ret
 
 installs = {}
 
@@ -172,6 +181,15 @@ def show_pkg_filelist(inst, pkg):
 def show_src_pkg(inst, pkg):
     install = installs[inst]
     return dict(install=install, src=install.get_src_pkg(pkg))
+
+@route("/search/<keyword>")
+@view("searchpkg")
+def search(keyword):
+    branch = request.query.branch
+    if not branch or branch not in installs:
+        branch = "qa"
+    pkgs = installs[branch].search_pkg(keyword)
+    return dict(pkgs=pkgs)
 
 if __name__ == "__main__":
     installs = {}
