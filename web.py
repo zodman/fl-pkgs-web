@@ -145,6 +145,14 @@ class Install:
         ret.sort(key=lambda pkg: pkg.name)
         return ret
 
+    def search_file(self, keyword):
+        ret = []
+        for pkg in self.get_pkgs(sort=False):
+            ret.extend([(path, pkg) for path in pkg.filelist
+                if keyword in path])
+        ret.sort(key=lambda e: e[0])
+        return ret
+
 installs = {}
 
 @route("/")
@@ -190,6 +198,15 @@ def search(keyword):
         branch = "qa"
     pkgs = installs[branch].search_pkg(keyword)
     return dict(pkgs=pkgs)
+
+@route("/search/file/<keyword>")
+@view("searchfile")
+def search(keyword):
+    branch = request.query.branch
+    if not branch or branch not in installs:
+        branch = "qa"
+    files = installs[branch].search_file(keyword)
+    return dict(files=files)
 
 if __name__ == "__main__":
     installs = {}
