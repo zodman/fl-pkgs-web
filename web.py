@@ -214,7 +214,7 @@ def receive_search():
     query = ""
     b = request.forms.branch
     if b in installs and b != "qa":
-        query = "&branch=%s" % b
+        query = "?branch=%s" % b
 
     if request.forms.searchtype == "file":
         redirect("/search/file/%s%s" % (request.forms.keyword.encode("utf8"), query))
