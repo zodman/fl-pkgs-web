@@ -102,9 +102,6 @@ class Install:
         self.labels = [Label(b) for b in labels]
 
     def get_pkgs(self, sort=True):
-        '''Note!: returned pkgs may not have detailed info yet. Only name and
-        revision are ensured.
-        '''
         ret = []
         for b in self.labels:
             ret.extend(b.get_pkgs())
