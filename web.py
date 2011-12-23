@@ -142,11 +142,14 @@ class Install:
         ret.sort(key=lambda pkg: pkg.name)
         return ret
 
-    def search_file(self, keyword):
+    def search_file(self, keyword, only_basename=False):
         ret = []
+        if only_basename:
+            func = lambda path: keyword in path.rsplit("/")[-1]
+        else:
+            func = lambda path: keyword in path
         for pkg in self.get_pkgs(sort=False):
-            ret.extend([(path, pkg) for path in pkg.filelist
-                if keyword in path])
+            ret.extend([(path, pkg) for path in pkg.filelist if func(path)])
         ret.sort(key=lambda e: e[0])
         return ret
 
@@ -206,7 +209,10 @@ def search_file(keyword):
     if not branch or branch not in installs:
         branch = "qa"
     install = installs[branch]
-    files = install.search_file(keyword)
+    if request.query.mode == "fullpath":
+        files = install.search_file(keyword)
+    else:
+        files = install.search_file(keyword, only_basename=True)
     return dict(install=install, files=files)
 
 @route("/search", method="POST")
@@ -217,6 +223,13 @@ def receive_search():
         query = "?branch=%s" % b
 
     if request.forms.searchtype == "file":
+        # search only filename or fullpath
+        if request.forms.mode == "fullpath":
+            if "?" not in query:
+                query += "?"
+            else:
+                query += "&"
+            query += "mode=fullpath"
         redirect("/search/file/%s%s" % (request.forms.keyword.encode("utf8"), query))
     else:
         redirect("/search/%s%s" % (request.forms.keyword.encode("utf8"), query))

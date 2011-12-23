@@ -33,10 +33,16 @@ part of packages. You can also get a full list of files in a given package.
   <input id="kw" type="text" name="keyword" />
   <input type="submit" value="Search" />
   <br />
+  <input type="hidden" name="searchtype" value="file"/>
+  <label for="searchfile">search in filenames</label>
+  <input id="searchfile" type="radio" value="filename" name="mode" checked="checked" />
+  <br />
+  <label for="searchpath">search in full path</label>
+  <input id="searchpath" type="radio" value="fullpath" name="mode" />
+  <br />
   <label for="branch">Branch:</label>
   <select id="branch" name="branch">
     <option value="stable">stable</option>
     <option selected="selected" value="qa">qa</option>
   </select>
-  <input type="hidden" name="searchtype" value="file"/>
 </form>

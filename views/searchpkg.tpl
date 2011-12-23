@@ -1,5 +1,4 @@
-matched pkgs (on {{install.name}} branch):
-%if pkgs:
+Found <strong>{{len(pkgs)}} results</strong> (on {{install.name}} branch):
 <ul>
 %for pkg in pkgs:
   %if pkg.name.endswith(":source"):
@@ -9,6 +8,3 @@ matched pkgs (on {{install.name}} branch):
   %end
 %end
 </ul>
-%else:
-None
-%end
