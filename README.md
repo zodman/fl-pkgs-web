@@ -28,3 +28,11 @@
 * issues:
   - userspace-kernel-firmware is available on both 2-qa and 2-qa-kernel. Not
     sure how to handle it.
+
+* requirement:
+  - bottle
+  - gevent
+
+* data size (included labels: fl:2, fl:2-kernel, fl:2-qa, fl:2-qa-kernel):
+  - rawdata 2.8G
+  - info 85M
