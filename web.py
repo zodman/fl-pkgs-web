@@ -1,6 +1,6 @@
-import os, time, json
+import time, json
 
-from bottle import route, run, view, abort, request
+from bottle import route, run, view, abort, request, redirect
 
 def format_size(size):
     if size < 1000:
@@ -189,7 +189,7 @@ def show_src_pkg(inst, pkg):
 
 @route("/search/<keyword>")
 @view("searchpkg")
-def search(keyword):
+def search_pkg(keyword):
     branch = request.query.branch
     if not branch or branch not in installs:
         branch = "qa"
@@ -199,13 +199,25 @@ def search(keyword):
 
 @route("/search/file/<keyword>")
 @view("searchfile")
-def search(keyword):
+def search_file(keyword):
     branch = request.query.branch
     if not branch or branch not in installs:
         branch = "qa"
     install = installs[branch]
     files = install.search_file(keyword)
     return dict(install=install, files=files)
+
+@route("/search", method="POST")
+def receive_search():
+    query = ""
+    b = request.forms.branch
+    if b in installs and b != "qa":
+        query = "&branch=%s" % b
+
+    if request.forms.searchtype == "file":
+        redirect("/search/file/%s%s" % (request.forms.keyword, query))
+    else:
+        redirect("/search/%s%s" % (request.forms.keyword, query))
 
 if __name__ == "__main__":
     installs = {}
