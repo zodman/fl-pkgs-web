@@ -6,10 +6,12 @@
 * web.py: server the JSON data to the web.
   - serves both HTML and JSON
 
-    +----------------+             +-------------+               +------+
-    |   repository   |  cache.py   | local cache |  convert.py   | JSON |
-    | REST interface | ----------> |     XML     | ------------> |      |
-    +----------------+             +-------------+               +------+
+* dataflow:
+
+        +----------------+             +-------------+               +------+
+        |   repository   |  cache.py   | local cache |  convert.py   | JSON |
+        | REST interface | ----------> |     XML     | ------------> |      |
+        +----------------+             +-------------+               +------+
 
 * usage:
   - python cache.py | tee log-cache
