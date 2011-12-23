@@ -175,21 +175,19 @@ def show_src_pkg(inst, pkg):
 
 if __name__ == "__main__":
     installs = {}
-    if os.path.exists("info/foresight.rpath.org@fl:2"):
-        installs["stable"] = Install("stable", "This is the stable branch of \
-                the Foresight Linux distribution. New release are usually made \
-                from this branch. However, due to various reasons, this branch \
-                hasn't been updated for a long time. Current releases are made \
-                from the QA branch.", [
-            "foresight.rpath.org@fl:2",
-            "foresight.rpath.org@fl:2-kernel"])
-    if os.path.exists("info/foresight.rpath.org@fl:2-qa"):
-        installs["qa"] = Install("qa", "This is the QA branch, which \
-                is synced frequently with the devel branch, and is meant for \
-                brave users who want to help with Foresight Linux development. \
-                For various reasons, this branch is also used for official \
-                releases.", [
-            "foresight.rpath.org@fl:2-qa",
-            "foresight.rpath.org@fl:2-qa-kernel"])
+    installs["stable"] = Install("stable", "This is the stable branch of \
+            the Foresight Linux distribution. New release are usually made \
+            from this branch. However, due to various reasons, this branch \
+            hasn't been updated for a long time. Current releases are made \
+            from the QA branch.", [
+        "foresight.rpath.org@fl:2",
+        "foresight.rpath.org@fl:2-kernel"])
+    installs["qa"] = Install("qa", "This is the QA branch, which \
+            is synced frequently with the devel branch, and is meant for \
+            brave users who want to help with Foresight Linux development. \
+            For various reasons, this branch is also used for official \
+            releases.", [
+        "foresight.rpath.org@fl:2-qa",
+        "foresight.rpath.org@fl:2-qa-kernel"])
 
     run(host="localhost", port=8080)
