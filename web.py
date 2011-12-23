@@ -193,8 +193,9 @@ def search(keyword):
     branch = request.query.branch
     if not branch or branch not in installs:
         branch = "qa"
-    pkgs = installs[branch].search_pkg(keyword)
-    return dict(pkgs=pkgs)
+    install = installs[branch]
+    pkgs = install.search_pkg(keyword)
+    return dict(install=install, pkgs=pkgs)
 
 @route("/search/file/<keyword>")
 @view("searchfile")
@@ -202,8 +203,9 @@ def search(keyword):
     branch = request.query.branch
     if not branch or branch not in installs:
         branch = "qa"
-    files = installs[branch].search_file(keyword)
-    return dict(files=files)
+    install = installs[branch]
+    files = install.search_file(keyword)
+    return dict(install=install, files=files)
 
 if __name__ == "__main__":
     installs = {}
