@@ -22,7 +22,7 @@ class SourceTrove:
     def __init__(self, data):
         self.name = data["name"]
         self.revision = data["revision"]
-        self.binpkgs = []
+        self.binpkgs = data.get("binpkgs", [])
 
 class Package:
     def __init__(self, data):
@@ -35,59 +35,75 @@ class Package:
         self.buildtime = format_buildtime(data["buildtime"])
         self.buildlog = data["buildlog"]
         self.included = data["included"]
-        self.filelist = data["filelist"]
+        self.filelist = data.get("filelist", [])
 
 class Label:
     def __init__(self, label, db):
         self.name = label
         self.branch = label.split("@")[1] # fl:2-devel etc
-        self._bin_pkgs = {}
         self._src_pkgs = {}
 
-        self._read_info(db)
-        self._all_info_complete = False
-
-    def _read_info(self, db):
-        # read binary packages
-        coll = db[self.branch + ":binary"]
-        for pkgdata in coll.find():
-            pkg = Package(pkgdata)
-            self._bin_pkgs[pkg.name] = pkg
-
-        # read src packages
-        coll = db[self.branch + ":source"]
-        for pkgdata in coll.find():
-            pkg = SourceTrove(pkgdata)
-            self._src_pkgs[pkg.name] = pkg
-
-        for k, p in self._bin_pkgs.items():
-            # associate :source with relevant pkgs
-            try:
-                self._src_pkgs[p.source].binpkgs.append(p)
-            except KeyError:
-                # when a pkg's :source can't be found, it means the :source has
-                # been redirected to nil, but the pkg is not (since it's a
-                # subpkg)
-                del self._bin_pkgs[k]
+        self._bin_pkgs = db[self.branch + ":binary"]
+        self._src_pkgs = db[self.branch + ":source"]
 
     def get_pkgs(self):
-        return self._bin_pkgs.values()
+        pkgs = self._bin_pkgs.find(fields={"filelist": False})
+        return [Package(pkg) for pkg in pkgs]
+
+    def count_binpkgs(self):
+        return self._bin_pkgs.count()
 
     def get_src_pkgs(self):
-        return self._src_pkgs.values()
+        pkgs = self._src_pkgs.find()
+        return [SourceTrove(pkg) for pkg in pkgs]
 
-    def get_pkg(self, name):
-        '''Could raise KeyError
+    def count_srcpkgs(self):
+        return self._src_pkgs.count()
+
+    def get_pkg(self, name, with_filelist=False):
+        '''Could return None
         '''
-        pkg = self._bin_pkgs[name]
-        return pkg
+        if with_filelist:
+            pkg = self._bin_pkgs.find_one({"name": name})
+        else:
+            pkg = self._bin_pkgs.find_one({"name": name},
+                    fields={"filelist": False})
+        if pkg:
+            return Package(pkg)
+        else:
+            return None
 
     def get_src_pkg(self, name):
         '''Could raise KeyError
         '''
         if not ":" in name:
             name += ":source"
-        return self._src_pkgs[name]
+        pkg = self._src_pkgs.find_one({"name": name})
+        if pkg:
+            binpkgs = self._bin_pkgs.find({"source": name},
+                    fields={"filelist": False})
+            pkg["binpkgs"] = [Package(p) for p in binpkgs]
+            return SourceTrove(pkg)
+        else:
+            return None
+
+    def search_pkg(self, keyword):
+        ret = self._bin_pkgs.find({"name": {"$regex": ".*%s.*" % keyword}},
+                fields={"filelist": False})
+        ret = [Package(pkg) for pkg in ret]
+        return ret
+
+    def search_file(self, keyword, only_basename=False):
+        # needs rethinking
+        ret = []
+        if only_basename:
+            func = lambda path: keyword in path.rsplit("/")[-1]
+        else:
+            func = lambda path: keyword in path
+        for pkg in self._bin_pkgs.find():
+            ret.extend([(path, Package(pkg)) for path in pkg["filelist"]
+                if func(path)])
+        return ret
 
 class Install:
     '''An install can have several labels, e.g. 2-qa should include fl:2-qa and
@@ -108,6 +124,9 @@ class Install:
             ret.sort(key=lambda p: p.name)
         return ret
 
+    def count_binpkgs(self):
+        return sum([b.count_binpkgs() for b in self.labels])
+
     def get_src_pkgs(self, sort=True):
         ret = []
         for b in self.labels:
@@ -116,40 +135,39 @@ class Install:
             ret.sort(key=lambda p: p.name)
         return ret
 
-    def get_pkg(self, name):
+    def count_srcpkgs(self):
+        return sum([b.count_srcpkgs() for b in self.labels])
+
+    def get_pkg(self, name, with_filelist=False):
         for b in self.labels:
-            try:
-                pkg = b.get_pkg(name)
+            pkg = b.get_pkg(name, with_filelist)
+            if pkg:
                 return pkg
-            except KeyError:
+            else:
                 continue
         abort(404, "No such page")
 
     def get_src_pkg(self, name):
         for b in self.labels:
-            try:
-                pkg = b.get_src_pkg(name)
+            pkg = b.get_src_pkg(name)
+            if pkg:
                 return pkg
-            except KeyError:
+            else:
                 continue
         abort(404, "No such page")
 
     def search_pkg(self, keyword):
-        ret = [pkg for pkg in self.get_pkgs(sort=False) +
-                              self.get_src_pkgs(sort=False)
-                if keyword in pkg.name]
+        ret = []
+        for b in self.labels:
+            ret.extend(b.search_pkg(keyword))
         ret.sort(key=lambda pkg: pkg.name)
         return ret
 
     def search_file(self, keyword, only_basename=False):
         ret = []
-        if only_basename:
-            func = lambda path: keyword in path.rsplit("/")[-1]
-        else:
-            func = lambda path: keyword in path
-        for pkg in self.get_pkgs(sort=False):
-            ret.extend([(path, pkg) for path in pkg.filelist if func(path)])
-        ret.sort(key=lambda e: e[0])
+        for b in self.labels:
+            ret.extend(b.search_file(keyword, only_basename))
+        ret.sort(key=lambda tup: tup[0])
         return ret
 
 installs = {}
@@ -181,7 +199,7 @@ def show_pkg(inst, pkg):
 @view("filelist")
 def show_pkg_filelist(inst, pkg):
     install = installs[inst]
-    return dict(install=install, pkg=install.get_pkg(pkg))
+    return dict(install=install, pkg=install.get_pkg(pkg, with_filelist=True))
 
 @route("/<inst:re:(stable|qa)>/source/<pkg>")
 @view("srcpkg")

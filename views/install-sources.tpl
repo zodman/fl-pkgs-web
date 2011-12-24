@@ -1,4 +1,4 @@
-<h1>Source Packages in the <b>{{install.name}}</b> branch (total: {{len(install.get_pkgs())}})</h1>
+<h1>Source Packages in the <b>{{install.name}}</b> branch (total: {{install.count_srcpkgs()}})</h1>
 
 <ul>
 %for pkg in install.get_src_pkgs():
