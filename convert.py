@@ -1,5 +1,6 @@
-import os, json
+import os
 from lxml import etree
+import pymongo
 
 def mkdir(path):
     if not os.path.exists(path):
@@ -150,6 +151,12 @@ class SourceTrove:
         self.name = xml.find("name").text
         self.revision = xml.find("version").find("revision").text
 
+    def to_dict(self):
+        return {
+            "name": self.name,
+            "revision": self.revision,
+            }
+
 class Label:
     '''Container of information about a conary label
     '''
@@ -205,20 +212,31 @@ class Label:
 
     def to_dict(self):
         return {
-            "pkgs": [pkg.to_dict() for pkg in self.get_pkgs()],
-            "srcpkgs": [(p.name, p.revision) for p in self.get_src_pkgs()]}
+            "binpkgs": [pkg.to_dict() for pkg in self.get_pkgs()],
+            "srcpkgs": [pkg.to_dict() for pkg in self.get_src_pkgs()]}
 
-def write_info(dest, obj):
-    print "=>", dest
+def write_info(db, label):
+    data = label.to_dict()
 
-    f = open(dest, "w")
-    json.dump(obj, f)
-    f.close()
+    # not sure about the schema. for now use twe separate collections for
+    # binary and source pkgs
+
+    print "storing %s binary pkgs" % label.branch
+    coll = db[label.branch + ":binary"]
+    for pkg in data["binpkgs"]:
+        pkg["_id"] = pkg["name"] # use pkg name as id
+        coll.save(pkg)
+
+    print "storing %s source pkgs" % label.branch
+    coll = db[label.branch + ":source"]
+    for pkg in data["srcpkgs"]:
+        pkg["_id"] = pkg["name"] # use pkg name as id
+        coll.save(pkg)
 
 def convert():
     cache = "rawdata"
-    output = "info"
-    mkdir(output)
+    conn = pymongo.Connection()
+    db = conn.fl_pkgs
     for b in [
             "foresight.rpath.org@fl:2",
             "foresight.rpath.org@fl:2-kernel",
@@ -226,7 +244,7 @@ def convert():
             "foresight.rpath.org@fl:2-qa-kernel",
             ]:
         label = Label(b, cache)
-        write_info("%s/%s" % (output, b), label.to_dict())
+        write_info(db, label)
 
 if __name__ == "__main__":
     convert()

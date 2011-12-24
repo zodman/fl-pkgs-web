@@ -1,5 +1,6 @@
-import os, time, json
+import os, time
 
+import pymongo
 from bottle import route, run, view, abort, request, redirect
 
 def format_size(size):
@@ -18,9 +19,9 @@ def format_buildtime(buildtime):
     return time.strftime("%a, %d %b %Y %H:%M", time.localtime(buildtime))
 
 class SourceTrove:
-    def __init__(self, name, revision):
-        self.name = name
-        self.revision = revision
+    def __init__(self, data):
+        self.name = data["name"]
+        self.revision = data["revision"]
         self.binpkgs = []
 
 class Package:
@@ -37,29 +38,27 @@ class Package:
         self.filelist = data["filelist"]
 
 class Label:
-    def __init__(self, label):
+    def __init__(self, label, db):
         self.name = label
         self.branch = label.split("@")[1] # fl:2-devel etc
         self._bin_pkgs = {}
         self._src_pkgs = {}
 
-        self._read_info()
+        self._read_info(db)
         self._all_info_complete = False
 
-    def _read_info(self):
-        f = open("info/%s" % self.name)
-        data = json.load(f)
-        f.close()
-
+    def _read_info(self, db):
         # read binary packages
-        for pkgdata in data["pkgs"]:
+        coll = db[self.branch + ":binary"]
+        for pkgdata in coll.find():
             pkg = Package(pkgdata)
             self._bin_pkgs[pkg.name] = pkg
 
         # read src packages
-        for name, revision in data["srcpkgs"]:
-            pkg = SourceTrove(name, revision)
-            self._src_pkgs[name] = pkg
+        coll = db[self.branch + ":source"]
+        for pkgdata in coll.find():
+            pkg = SourceTrove(pkgdata)
+            self._src_pkgs[pkg.name] = pkg
 
         for k, p in self._bin_pkgs.items():
             # associate :source with relevant pkgs
@@ -96,10 +95,10 @@ class Install:
 
     Not sure `install` is a good name.
     '''
-    def __init__(self, name, description, labels):
+    def __init__(self, name, description, labels, db):
         self.name = name
         self.description = description
-        self.labels = [Label(b) for b in labels]
+        self.labels = [Label(b, db) for b in labels]
 
     def get_pkgs(self, sort=True):
         ret = []
@@ -235,6 +234,8 @@ def receive_search():
         redirect("/search/%s%s" % (request.forms.keyword.encode("utf8"), query))
 
 if __name__ == "__main__":
+    conn = pymongo.Connection()
+    db = conn.fl_pkgs
     installs = {}
     installs["stable"] = Install("stable", "This is the stable branch of \
             the Foresight Linux distribution. New release are usually made \
@@ -242,13 +243,13 @@ if __name__ == "__main__":
             hasn't been updated for a long time. Current releases are made \
             from the QA branch.", [
         "foresight.rpath.org@fl:2",
-        "foresight.rpath.org@fl:2-kernel"])
+        "foresight.rpath.org@fl:2-kernel"], db)
     installs["qa"] = Install("qa", "This is the QA branch, which \
             is synced frequently with the devel branch, and is meant for \
             brave users who want to help with Foresight Linux development. \
             For various reasons, this branch is also used for official \
             releases.", [
         "foresight.rpath.org@fl:2-qa",
-        "foresight.rpath.org@fl:2-qa-kernel"])
+        "foresight.rpath.org@fl:2-qa-kernel"], db)
 
     run(server='gevent', host="0.0.0.0", port=int(os.environ.get('PORT', 5000)))
