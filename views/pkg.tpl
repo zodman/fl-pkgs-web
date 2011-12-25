@@ -2,7 +2,9 @@
 <p>branch <a href="/{{install.name}}">{{install.name}}</a>
 <p>full installed size: {{pkg.size}}</p>
 <p>source: <a href="/{{install.name}}/source/{{pkg.source.split(":")[0]}}">{{pkg.source}}</a></p>
+%if not pkg.name.startswith("group-"):
 <p><a href="/{{install.name}}/{{pkg.name}}/filelist">list of files</a></p>
+%end
 <p>included:
 <ul>
 %for p in pkg.included:
