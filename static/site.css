@@ -1,0 +1,10 @@
+table {
+  border-bottom: 1px solid #A9ABB3;
+  border-top: 1px solid #A9ABB3;
+}
+
+td {
+  background-image: url("/static/img/greydot.png");
+  background-position: left top;
+  background-repeat: repeat-x;
+}

@@ -1,7 +1,7 @@
 import os, time
 
 import pymongo
-from bottle import route, run, view, abort, request, redirect
+from bottle import route, run, view, abort, request, redirect, static_file
 
 def format_size(size):
     if size < 1000:
@@ -250,6 +250,10 @@ def receive_search():
         redirect("/search/file/%s%s" % (request.forms.keyword.encode("utf8"), query))
     else:
         redirect("/search/%s%s" % (request.forms.keyword.encode("utf8"), query))
+
+@route("/static/<filename:path>")
+def serve_static(filename):
+    return static_file(filename, root="static")
 
 if __name__ == "__main__":
     conn = pymongo.Connection()
