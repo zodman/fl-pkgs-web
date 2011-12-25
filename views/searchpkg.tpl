@@ -1,4 +1,6 @@
-Found <strong>{{len(pkgs)}} results</strong> (on {{install.name}} branch):
+%rebase layout title="Package search result - %s in %s" % (keyword, install.name)
+
+You have searched for packages that names contain <em>{{keyword}}</em> in the <em>{{install.name}}</em> branch. Found <strong>{{len(pkgs)}} results</strong>:
 <ul>
 %for pkg in pkgs:
   %if pkg.name.endswith(":source"):

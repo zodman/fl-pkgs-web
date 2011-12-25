@@ -216,7 +216,7 @@ def search_pkg(keyword):
         branch = "qa"
     install = installs[branch]
     pkgs = install.search_pkg(keyword)
-    return dict(install=install, pkgs=pkgs)
+    return dict(pkgs=pkgs, keyword=keyword, install=install)
 
 @route("/search/file/<keyword:path>")
 @view("searchfile")
@@ -230,7 +230,7 @@ def search_file(keyword):
         files = install.search_file(keyword)
     else:
         files = install.search_file(keyword, only_basename=True)
-    return dict(install=install, files=files)
+    return dict(files=files, keyword=keyword, install=install)
 
 @route("/search", method="POST")
 def receive_search():

@@ -1,3 +1,5 @@
+%rebase layout title="Source packages in %s branch" % install.name
+
 <h1>Source Packages in the <b>{{install.name}}</b> branch (total: {{install.count_srcpkgs()}})</h1>
 
 <ul>

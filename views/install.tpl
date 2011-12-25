@@ -1,3 +1,5 @@
+%rebase layout title="Packages in %s branch" % install.name
+
 <h1>Software Packages in the <b>{{install.name}}</b> branch (total: {{install.count_binpkgs()}})</h1>
 
 <ul>

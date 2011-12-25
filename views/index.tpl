@@ -1,3 +1,5 @@
+%rebase layout title="Packages"
+
 <h1>Packages in Foresight Linux</h1>
 
 <h2>View package lists</h2>

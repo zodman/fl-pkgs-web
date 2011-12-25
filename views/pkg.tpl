@@ -1,3 +1,5 @@
+%rebase layout title="Details of %s in %s branch" % (pkg.name, install.name)
+
 <h1>Package: {{pkg.name}} ({{pkg.revision}})</h1>
 <p>branch <a href="/{{install.name}}">{{install.name}}</a>
 <p>full installed size: {{pkg.size}}</p>
