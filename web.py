@@ -1,4 +1,4 @@
-import os, time
+import os, time, re
 
 import pymongo
 from bottle import route, run, view, abort, request, redirect, static_file
@@ -88,7 +88,7 @@ class Label:
             return None
 
     def search_pkg(self, keyword):
-        ret = self._bin_pkgs.find({"name": {"$regex": ".*%s.*" % keyword}},
+        ret = self._bin_pkgs.find({"name": re.compile(keyword, re.IGNORECASE)},
                 fields={"filelist": False})
         ret = [Package(pkg) for pkg in ret]
         return ret
@@ -97,9 +97,9 @@ class Label:
         # needs rethinking
         ret = []
         if only_basename:
-            func = lambda path: keyword in path.rsplit("/")[-1]
+            func = lambda path: keyword.lower() in path.rsplit("/")[-1].lower()
         else:
-            func = lambda path: keyword in path
+            func = lambda path: keyword.lower() in path.lower()
         for pkg in self._bin_pkgs.find():
             ret.extend([(path, Package(pkg)) for path in pkg["filelist"]
                 if func(path)])
