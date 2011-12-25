@@ -169,26 +169,11 @@ class Label:
         self.name = label
         self.branch = label.split("@")[1]
         self.cache = cache
-        self._bin_pkgs = {}
         self._src_pkgs = {}
+        self._bin_pkgs = {}
 
-        self._read_bin_pkgs(read_pkg_details)
         self._read_src_pkgs()
-
-    def _read_bin_pkgs(self, read_details):
-        f = open("%s/%s" % (self.cache, self.name))
-        content = f.read()
-        f.close()
-
-        for e in etree.XML(content):
-            pkg = Package(e, self)
-            if pkg.revision.startswith("0-"):
-                continue
-            self._bin_pkgs[pkg.name] = pkg
-
-        if read_details:
-            for pkg in self._bin_pkgs.values():
-                pkg.read_info()
+        self._read_bin_pkgs(read_pkg_details)
 
     def _read_src_pkgs(self):
         f = open("%s/source-%s" % (self.cache, self.name))
@@ -200,6 +185,24 @@ class Label:
             if pkg.revision.startswith("0-"):
                 continue
             self._src_pkgs[pkg.name] = pkg
+
+    def _read_bin_pkgs(self, read_details):
+        f = open("%s/%s" % (self.cache, self.name))
+        content = f.read()
+        f.close()
+
+        for e in etree.XML(content):
+            pkg = Package(e, self)
+            # skip nil pkgs
+            if pkg.revision.startswith("0-"):
+                continue
+            self._bin_pkgs[pkg.name] = pkg
+
+        if read_details:
+            for k, pkg in self._bin_pkgs.items():
+                pkg.read_info()
+                if pkg.source not in self._src_pkgs:
+                    del self._bin_pkgs[k]
 
     def get_pkgs(self):
         return self._bin_pkgs.values()
@@ -223,14 +226,14 @@ def write_info(db, label):
 
     print "storing %s binary pkgs" % label.branch
     coll = db[label.branch + ":binary"]
+    coll.ensure_index("name")
     for pkg in data["binpkgs"]:
-        pkg["_id"] = pkg["name"] # use pkg name as id
         coll.save(pkg)
 
     print "storing %s source pkgs" % label.branch
     coll = db[label.branch + ":source"]
+    coll.ensure_index("name")
     for pkg in data["srcpkgs"]:
-        pkg["_id"] = pkg["name"] # use pkg name as id
         coll.save(pkg)
 
 def convert():
