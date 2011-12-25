@@ -5,6 +5,6 @@ You have searched for files that names contain <em>{{keyword}}</em> in the <em>{
 <table>
 <tr><th>File</th><th>Package</th></tr>
 %for (path, pkg) in files:
-  <tr><td>{{path}}</td><td><a href="/{{install.name}}/{{pkg.name}}">{{pkg.name}}</a> ({{pkg.revision}})</td></tr>
+  <tr><td class="file">{{!path.replace(keyword, "<span class=\"keyword\">%s</span>" % keyword)}}</td><td><a href="/{{install.name}}/{{pkg.name}}">{{pkg.name}}</a> ({{pkg.revision}})</td></tr>
 %end
 </table>

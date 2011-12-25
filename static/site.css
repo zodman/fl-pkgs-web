@@ -8,3 +8,13 @@ td {
   background-position: left top;
   background-repeat: repeat-x;
 }
+
+td.file {
+  font-family: monospace;
+}
+
+span.keyword {
+  color: #444444;
+  font-weight: bold;
+  letter-spacing: 0.05em;
+}
