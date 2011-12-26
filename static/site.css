@@ -18,3 +18,49 @@ span.keyword {
   font-weight: bold;
   letter-spacing: 0.05em;
 }
+
+#navbar {
+  background-color: transparent;
+  border-bottom: 1px solid #529431;
+  display: block;
+  list-style: none outside none;
+  margin-bottom: 0;
+  margin-top: 0;
+  padding: 0;
+  text-indent: 0;
+}
+
+#navbar ul {
+  clear: both;
+  margin: 0;
+  overflow: hidden;
+  padding: 0;
+}
+
+#navbar li {
+  float: left;
+  list-style: none outside none;
+  margin: 0;
+  padding: 0;
+}
+
+#navbar a:link, #navbar a:visited {
+  display: block;
+  padding: 0.75em 0.5em 0.25em;
+  color: black;
+  text-decoration: none;
+  border-left: 1px solid #529431;
+  border-right: 1px solid #529431;
+}
+
+#navbar a:hover {
+  background-color: #529431;
+}
+
+#navbar a#current {
+  font-weight: bold;
+}
+
+#content {
+  margin: 0 10px 0 52px;
+}
