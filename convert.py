@@ -1,4 +1,4 @@
-import os
+import os, json
 from lxml import etree
 import pymongo
 
@@ -72,13 +72,13 @@ class TroveInfoParser:
         self.included = included
 
 class Package:
-    def __init__(self, xml, cache):
+    def __init__(self, data, cache):
         self.cache = cache
-        self.name = xml.find("name").text
-        self.revision = xml.find("version").find("revision").text
-
+        self.name = data["name"]
+        self.revision = data["revision"]
         # list of flavor names; would be [None] if this is a no-flavor pkg
-        self.flavors = []
+        self.flavors = data["flavors"]
+
         self.size = None # int
         self.source = None # str
         self.buildtime = None # int; unix time
@@ -98,12 +98,7 @@ class Package:
             self._read_filelist()
 
     def _parse(self, xml):
-        self.flavors = [t.find("displayflavor").text for t in xml]
-
-        # all troves should contain mostly same info.
-        # some info is different, e.g. size/buildtime/buildlog, but for now we
-        # just consider the first trove.
-        info = TroveInfoParser(xml[0])
+        info = TroveInfoParser(xml)
         self.size = info.size
         self.source = info.source
         self.buildtime = info.buildtime
@@ -193,14 +188,11 @@ class Label:
 
     def _read_bin_pkgs(self, label):
         f = open("%s/%s" % (self.cache, label))
-        content = f.read()
+        pkgs = json.load(f)
         f.close()
 
-        for e in etree.XML(content):
-            pkg = Package(e, "%s/%s" % (self.cache, label.split("@")[1]))
-            # skip nil pkgs
-            if pkg.revision.startswith("0-"):
-                continue
+        for pkg in pkgs:
+            pkg = Package(pkg, "%s/%s" % (self.cache, label.split("@")[1]))
             self._bin_pkgs[pkg.name] = pkg
 
     def _read_pkg_details(self):
@@ -252,6 +244,8 @@ def convert():
              "foresight.rpath.org@fl:2-kernel"),
             ("foresight.rpath.org@fl:2-qa",
              "foresight.rpath.org@fl:2-qa-kernel"),
+            ("foresight.rpath.org@fl:2-devel",
+             "foresight.rpath.org@fl:2-devel-kernel"),
             ]:
         label = Label(b, cache)
         write_info(db, label)

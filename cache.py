@@ -1,4 +1,4 @@
-import sys, os, urllib2
+import sys, os, urllib2, json
 # running a do-nothing refresh of components:
 # lxml takes 0m56.850s.
 # cElementTree takes 1m2.269s.
@@ -31,7 +31,13 @@ class Package:
     def __init__(self, xmlelement):
         self.name = xmlelement.find("name").text
         self.revision = xmlelement.find("version").find("revision").text
-        self.trovelist = xmlelement.find("trovelist").get("id")
+        self.ordering = float(xmlelement.find("version").find("ordering").text)
+        # link to pkg details
+        self.troveinfo = xmlelement.get("id")
+        self.flavors = [xmlelement.find("flavor").text]
+
+    def to_dict(self):
+        return dict(name=self.name, revision=self.revision, flavors=self.flavors)
 
 def fetch_api_data(api, dest):
     '''Reading from url @api, and write to file @dest
@@ -41,21 +47,45 @@ def fetch_api_data(api, dest):
     content = u.read()
     u.close()
 
-    log("writing %s" % dest)
-    f = open(dest + ".new", "w")
-    f.write(content)
-    f.close()
-    os.rename(dest + ".new", dest)
+    if dest:
+        log("writing %s" % dest)
+        f = open(dest + ".new", "w")
+        f.write(content)
+        f.close()
+        os.rename(dest + ".new", dest)
 
     return content
 
 def parse_pkg_list(xml):
-    '''Read a <nodelist> and return a list of pkgs contained within
+    '''Read a <trovelist> and return a list of pkgs contained within
+
+    The <trovelist> from /api/trove contains all flavors of a pkg (and in some
+    cases, older versions of the pkg as well), but we only record the info link
+    (Package.troveinfo) of one flavor (and also collect all flavors into
+    Package.flavors).
     '''
-    ret = [Package(e) for e in etree.XML(xml)]
-    # drop nil pkgs
-    ret = [p for p in ret if not p.revision.startswith("0-")]
+    pkgs = {}
+    for e in etree.XML(xml):
+        pkg = Package(e)
+        # drop nil pkgs
+        if pkg.revision.startswith("0-"):
+            continue
+        if pkg.name in pkgs and pkgs[pkg.name].ordering > pkg.ordering:
+            continue
+        if pkg.name in pkgs and pkgs[pkg.name].ordering == pkg.ordering:
+            pkgs[pkg.name].flavors.extend(pkg.flavors)
+            continue
+        pkgs[pkg.name] = pkg
+    ret = pkgs.values()
     return ret
+
+def write_pkg_list(pkgs, dest):
+    '''Write the parsed pkg list instead of the raw XML. So we don't have to
+    repeat ourselves in convert.py
+    '''
+    f = open(dest, "w")
+    json.dump([pkg.to_dict() for pkg in pkgs], f)
+    f.close()
 
 def fetch_component_info(link, f):
     if os.path.exists(f):
@@ -82,8 +112,7 @@ def fetch_components_for_pkg(pkgfile, destdir):
     content = f.read()
     f.close()
 
-    # only take the first of the trovelist (usu. the is:x86 one)
-    xml = etree.XML(content)[0]
+    xml = etree.XML(content)
     revision = xml.find("version").find("revision").text
 
     included = [(t.find("name").text, t.get("id"))
@@ -100,9 +129,12 @@ def fetch_components_for_pkg(pkgfile, destdir):
                 "fl:2-qa": ("community-themes:data-0.13-3-3",
                             "pitivi:locale-0.15.0-1-1",
                             "pitivi:runtime-0.15.0-1-1"),
+                "fl:2-devel": ("community-themes:data-0.13-3-3",
+                            "pitivi:locale-0.15.0-1-1",
+                            "pitivi:runtime-0.15.0-1-1"),
                 }
         if f in blacklist.get(destdir.split("/")[-2], []):
-            log_error("skipping %s" % f)
+            log_error("skipping %s/%s" % (destdir, f))
             continue
         #### end ####
 
@@ -112,26 +144,28 @@ def fetch_components_for_pkg(pkgfile, destdir):
     return ret
 
 def refresh_pkg_list(api_site, label, cachedir):
-    '''Fetch the list of pkgs, called 'nodes' in conary REST API.
+    '''Fetch the list of pkgs
     '''
-    api = "%s/node?label=%s&type=package&type=group" % (api_site, label)
+    api = "%s/trove?label=%s&type=package&type=group" % (api_site, label)
+    content = fetch_api_data(api, None)
+
+    pkgs = parse_pkg_list(content)
     dest = "%s/%s" % (cachedir, label)
-    content = fetch_api_data(api, dest)
+    write_pkg_list(pkgs, dest)
 
     destdir = "%s/%s" % (cachedir, label.split("@")[-1])
     mkdir(destdir)
 
-    pkgs = parse_pkg_list(content)
     for pkg in pkgs:
         f = "%s/%s-%s" % (destdir, pkg.name, pkg.revision)
         if not os.path.exists(f):
-            fetch_api_data(pkg.trovelist, f)
+            fetch_api_data(pkg.troveinfo, f)
 
     tokeep = ["%s-%s" % (p.name, p.revision) for p in pkgs]
     cleanup_dir(destdir, tokeep)
 
 def refresh_source_list(api_site, label, cachedir):
-    api = "%s/node?label=%s&type=source" % (api_site, label)
+    api = "%s/trove?label=%s&type=source" % (api_site, label)
     dest = "%s/source-%s" % (cachedir, label)
     fetch_api_data(api, dest)
 
@@ -163,6 +197,8 @@ def main():
         "foresight.rpath.org@fl:2-kernel",
         "foresight.rpath.org@fl:2-qa",
         "foresight.rpath.org@fl:2-qa-kernel",
+        "foresight.rpath.org@fl:2-devel",
+        "foresight.rpath.org@fl:2-devel-kernel",
         ]
 
     cache = "rawdata"
