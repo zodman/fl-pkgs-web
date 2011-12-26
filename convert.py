@@ -228,12 +228,14 @@ def write_info(db, label):
     coll = db[label.branch + ":binary"]
     coll.ensure_index("name")
     for pkg in data["binpkgs"]:
+        pkg["_id"] = pkg["name"] # use pkg name as id
         coll.save(pkg)
 
     print "storing %s source pkgs" % label.branch
     coll = db[label.branch + ":source"]
     coll.ensure_index("name")
     for pkg in data["srcpkgs"]:
+        pkg["_id"] = pkg["name"] # use pkg name as id
         coll.save(pkg)
 
 def convert():
