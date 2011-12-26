@@ -64,3 +64,7 @@ span.keyword {
 #content {
   margin: 0 10px 0 52px;
 }
+
+.footer {
+  font-size: 0.75em;
+}

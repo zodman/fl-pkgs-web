@@ -2,6 +2,15 @@
 
 <h1>Packages in Foresight Linux</h1>
 
+<p>
+Bonjour! Here you can find information about packages from the Foresight Linux
+repository.
+</p>
+<p>
+Any issues you spot, please kindly let us know through the forum or
+our issue tracking system FITS.
+</p>
+
 <h2>View package lists</h2>
 
 <dl>
@@ -48,3 +57,8 @@ part of packages. You can also get a full list of files in a given package.
     <option selected="selected" value="qa">qa</option>
   </select>
 </form>
+
+<div class="footer">
+  Any issue with this website, please report to
+  <a href="https://github.com/zhangsen/fl-pkgs-web">the github page</a>.
+</div>
