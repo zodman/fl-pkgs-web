@@ -5,10 +5,10 @@
 <h2>View package lists</h2>
 
 <dl>
-%for install in installs:
-  <dt><a href="/{{install.name}}">View the packages in the {{install.name}} branch</a>
-    (<a href="/{{install.name}}/source">view source packages</a>)</dt>
-  <dd>{{install.description}}</dd>
+%for branch in branches:
+  <dt><a href="/{{branch.name}}">View the packages in the {{branch.name}} branch</a>
+    (<a href="/{{branch.name}}/source">view source packages</a>)</dt>
+  <dd>{{branch.description}}</dd>
 %end
 </dl>
 

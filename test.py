@@ -5,11 +5,10 @@ import unittest
 import convert
 
 test_b = "foresight.rpath.org@fl:2-qa"
-test_label = convert.Label(test_b, cache="datatest", read_pkg_details=False)
+test_label = convert.Label([test_b], cache="datatest", read_pkg_details=False)
 
 class TestXMLConvert(unittest.TestCase):
     def test_read_pkg_list(self):
-        self.assertEqual(test_b, test_label.name)
         self.assertEqual(3503, len(test_label.get_pkgs()))
 
     def test_src_pkg_list(self):

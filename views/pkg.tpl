@@ -1,17 +1,17 @@
-%rebase layout title="Details of %s in %s branch" % (pkg.name, install.name)
+%rebase layout title="Details of %s in %s branch" % (pkg.name, branch.name)
 
 <h1>Package: {{pkg.name}} ({{pkg.revision}})</h1>
-<p>branch <a href="/{{install.name}}">{{install.name}}</a>
+<p>branch <a href="/{{branch.name}}">{{branch.name}}</a>
 <p>full installed size: {{pkg.size}}</p>
-<p>source: <a href="/{{install.name}}/source/{{pkg.source.split(":")[0]}}">{{pkg.source}}</a></p>
+<p>source: <a href="/{{branch.name}}/source/{{pkg.source.split(":")[0]}}">{{pkg.source}}</a></p>
 %if not pkg.name.startswith("group-"):
-<p><a href="/{{install.name}}/{{pkg.name}}/filelist">list of files</a></p>
+<p><a href="/{{branch.name}}/{{pkg.name}}/filelist">list of files</a></p>
 %end
 <p>included:
 <ul>
 %for p in pkg.included:
   %if pkg.name.startswith("group-"):
-      <li><a href="/{{install.name}}/{{p}}">{{p}}</a></li>
+      <li><a href="/{{branch.name}}/{{p}}">{{p}}</a></li>
   %else:
       <li>{{p}}</li>
   %end

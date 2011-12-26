@@ -72,8 +72,8 @@ class TroveInfoParser:
         self.included = included
 
 class Package:
-    def __init__(self, xml, label):
-        self.label = label
+    def __init__(self, xml, cache):
+        self.cache = cache
         self.name = xml.find("name").text
         self.revision = xml.find("version").find("revision").text
 
@@ -90,8 +90,7 @@ class Package:
     def read_info(self, with_filelist=True):
         '''Read detailed information from cached data
         '''
-        f = open("%s/%s/%s-%s" % (self.label.cache, self.label.branch,
-            self.name, self.revision))
+        f = open("%s/%s-%s" % (self.cache, self.name, self.revision))
         content = f.read()
         f.close()
         self._parse(etree.XML(content))
@@ -117,8 +116,7 @@ class Package:
         '''
         self.filelist = []
         for trove in self.included:
-            f = "%s/%s/components/%s-%s" % (self.label.cache,
-                    self.label.branch, trove, self.revision)
+            f = "%s/components/%s-%s" % (self.cache, trove, self.revision)
             try:
                 self.filelist.extend(read_trove_filelist(f))
             except IOError as e:
@@ -158,25 +156,32 @@ class SourceTrove:
             }
 
 class Label:
-    '''Container of information about a conary label
-    '''
-    def __init__(self, label, cache, read_pkg_details=True):
-        '''Read information about a @label from cached data at @cache.
+    def __init__(self, labels, cache, read_pkg_details=True):
+        '''A Label is a container of one or more conary labels, which are
+        always installed together (e.g. fl:2 and fl:2-kernel)
+
+        The first label is taken as the primary one, and the rest are
+        auxiliary.
+
+        Read information about @labels from cached data at @cache.
 
         If @read_pkg_details is True, will read detailed info of each pkg.
         Could take a long time.
         '''
-        self.name = label
-        self.branch = label.split("@")[1]
+        self.branch = labels[0].split("@")[1]
         self.cache = cache
         self._src_pkgs = {}
         self._bin_pkgs = {}
 
-        self._read_src_pkgs()
-        self._read_bin_pkgs(read_pkg_details)
+        for b in labels:
+            self._read_src_pkgs(b)
+        for b in labels:
+            self._read_bin_pkgs(b)
+        if read_pkg_details:
+            self._read_pkg_details()
 
-    def _read_src_pkgs(self):
-        f = open("%s/source-%s" % (self.cache, self.name))
+    def _read_src_pkgs(self, label):
+        f = open("%s/source-%s" % (self.cache, label))
         content = f.read()
         f.close()
 
@@ -186,23 +191,23 @@ class Label:
                 continue
             self._src_pkgs[pkg.name] = pkg
 
-    def _read_bin_pkgs(self, read_details):
-        f = open("%s/%s" % (self.cache, self.name))
+    def _read_bin_pkgs(self, label):
+        f = open("%s/%s" % (self.cache, label))
         content = f.read()
         f.close()
 
         for e in etree.XML(content):
-            pkg = Package(e, self)
+            pkg = Package(e, "%s/%s" % (self.cache, label.split("@")[1]))
             # skip nil pkgs
             if pkg.revision.startswith("0-"):
                 continue
             self._bin_pkgs[pkg.name] = pkg
 
-        if read_details:
-            for k, pkg in self._bin_pkgs.items():
-                pkg.read_info()
-                if pkg.source not in self._src_pkgs:
-                    del self._bin_pkgs[k]
+    def _read_pkg_details(self):
+        for k, pkg in self._bin_pkgs.items():
+            pkg.read_info()
+            if pkg.source not in self._src_pkgs:
+                del self._bin_pkgs[k]
 
     def get_pkgs(self):
         return self._bin_pkgs.values()
@@ -243,10 +248,10 @@ def convert():
     conn = pymongo.Connection()
     db = conn.fl_pkgs
     for b in [
-            "foresight.rpath.org@fl:2",
-            "foresight.rpath.org@fl:2-kernel",
-            "foresight.rpath.org@fl:2-qa",
-            "foresight.rpath.org@fl:2-qa-kernel",
+            ("foresight.rpath.org@fl:2",
+             "foresight.rpath.org@fl:2-kernel"),
+            ("foresight.rpath.org@fl:2-qa",
+             "foresight.rpath.org@fl:2-qa-kernel"),
             ]:
         label = Label(b, cache)
         write_info(db, label)
