@@ -47,16 +47,17 @@ class Branch:
         self._bin_pkgs = db[branch + ":binary"]
         self._src_pkgs = db[branch + ":source"]
 
-    def get_pkgs(self):
+    def get_pkgs(self, skip=0, limit=50):
         pkgs = self._bin_pkgs.find(fields={"filelist": False},
-                sort=[("name", pymongo.ASCENDING)])
+                skip=skip, limit=limit, sort=[("name", pymongo.ASCENDING)])
         return [Package(pkg) for pkg in pkgs]
 
     def count_binpkgs(self):
         return self._bin_pkgs.count()
 
-    def get_src_pkgs(self):
-        pkgs = self._src_pkgs.find(sort=[("name", pymongo.ASCENDING)])
+    def get_src_pkgs(self, skip=0, limit=50):
+        pkgs = self._src_pkgs.find(skip=skip, limit=limit,
+                sort=[("name", pymongo.ASCENDING)])
         return [SourceTrove(pkg) for pkg in pkgs]
 
     def count_srcpkgs(self):
@@ -90,11 +91,13 @@ class Branch:
         else:
             abort(404, "No such page")
 
-    def search_pkg(self, keyword):
-        ret = self._bin_pkgs.find({"name": re.compile(keyword, re.IGNORECASE)},
-                fields={"filelist": False}, sort=[("name", pymongo.ASCENDING)])
-        ret = [Package(pkg) for pkg in ret]
-        return ret
+    def search_pkg(self, keyword, skip=0, limit=50):
+        pkgs = self._bin_pkgs.find({"name": re.compile(keyword, re.IGNORECASE)},
+                skip=skip, limit=limit, fields={"filelist": False},
+                sort=[("name", pymongo.ASCENDING)])
+        total = pkgs.count()
+        pkgs = [Package(pkg) for pkg in pkgs]
+        return pkgs, total
 
     def search_file(self, keyword, only_basename=False):
         # needs rethinking
@@ -119,6 +122,25 @@ def parse_search_term(keyword, query):
     branch = branches[b]
     return keyword, branch
 
+def get_value_gt(value, minim, default):
+    '''Cast @value to int, making sure it's greater than @minim. If not, return
+    @default.
+    '''
+    try:
+        ret = int(value)
+    except:
+        ret = default
+    if ret < minim:
+        ret = default
+    return ret
+
+def get_pagination(query):
+    '''Get pagination info. Return requested start and limit
+    '''
+    start = get_value_gt(request.query.start, minim=1, default=1)
+    limit = get_value_gt(request.query.limit, minim=1, default=50)
+    return start, limit
+
 @route("/")
 @view("index")
 def index():
@@ -127,14 +149,20 @@ def index():
 @route("/<b:re:(stable|qa)>")
 @view("branch")
 def show_branch(b):
-    return dict(branch=branches[b])
+    start, limit = get_pagination(request.query)
+    branch = branches[b]
+    pkgs = branch.get_pkgs(start - 1, limit)
+    return dict(branch=branch, pkgs=pkgs, start=start, limit=limit)
 
 @route("/<b:re:(stable|qa)>/source")
 @view("branch-sources")
 def show_branch_sources(b):
     '''List :source packages
     '''
-    return dict(branch=branches[b])
+    start, limit = get_pagination(request.query)
+    branch = branches[b]
+    pkgs = branch.get_src_pkgs(start - 1, limit)
+    return dict(branch=branch, pkgs=pkgs, start=start, limit=limit)
 
 @route("/<b:re:(stable|qa)>/<pkg>")
 @view("pkg")
@@ -157,9 +185,11 @@ def show_src_pkg(b, pkg):
 @route("/search/<keyword>")
 @view("searchpkg")
 def search_pkg(keyword):
+    start, limit = get_pagination(request.query)
     keyword, branch = parse_search_term(keyword, request.query)
-    pkgs = branch.search_pkg(keyword)
-    return dict(pkgs=pkgs, keyword=keyword, branch=branch)
+    pkgs, total = branch.search_pkg(keyword, start, limit)
+    return dict(pkgs=pkgs, total=total, keyword=keyword, branch=branch,
+            start=start, limit=limit)
 
 @route("/search/file/<keyword:path>")
 @view("searchfile")

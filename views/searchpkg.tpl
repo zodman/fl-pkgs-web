@@ -1,6 +1,13 @@
 %rebase layout title="Package search result - %s in %s" % (keyword, branch.name)
 
-You have searched for packages that names contain <em>{{keyword}}</em> in the <em>{{branch.name}}</em> branch. Found <strong>{{len(pkgs)}} results</strong>:
+<p>
+You have searched for packages that names contain <em>{{keyword}}</em> in the <em>{{branch.name}}</em> branch.
+</p>
+
+<p>
+Showing {{start}}-{{start + limit - 1}} of <strong>{{total}} results</strong>:
+</p>
+
 <ul>
 %for pkg in pkgs:
   %if pkg.name.endswith(":source"):
