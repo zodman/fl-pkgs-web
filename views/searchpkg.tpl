@@ -5,7 +5,7 @@ You have searched for packages that names contain <em>{{keyword}}</em> in the <e
 </p>
 
 <p>
-Showing {{start}}-{{start + limit - 1}} of <strong>{{total}} results</strong>:
+Showing {{start}}-{{min(start + limit - 1, total)}} of <strong>{{total}} results</strong>:
 </p>
 
 <ul>
@@ -17,3 +17,5 @@ Showing {{start}}-{{start + limit - 1}} of <strong>{{total}} results</strong>:
   %end
 %end
 </ul>
+
+%include pager url="/search/%s/package/%s" % (branch.name, keyword), start=start, limit=limit, total=total

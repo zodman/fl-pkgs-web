@@ -3,7 +3,7 @@
 <h1>Software Packages in the <b>{{branch.name}}</b> branch</h2>
 
 <p>
-Showing {{start}}-{{start + limit - 1}} of {{branch.count_binpkgs()}}:
+Showing {{start}}-{{min(start + limit - 1, branch.count_binpkgs())}} of {{branch.count_binpkgs()}}:
 </p>
 
 <ul>
@@ -11,3 +11,5 @@ Showing {{start}}-{{start + limit - 1}} of {{branch.count_binpkgs()}}:
   <li><a href="/{{branch.name}}/{{pkg.name}}">{{pkg.name}}</a> ({{pkg.revision}})</li>
 %end
 </ul>
+
+%include pager url="/" + branch.name, start=start, limit=limit, total=branch.count_binpkgs()
