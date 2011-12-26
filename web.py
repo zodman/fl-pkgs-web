@@ -114,14 +114,6 @@ class Branch:
 
 branches = {}
 
-def parse_search_term(keyword, query):
-    keyword = keyword.decode("utf8")
-    b = query.branch
-    if not b or b not in branches:
-        b = "qa"
-    branch = branches[b]
-    return keyword, branch
-
 def get_value_gt(value, minim, default):
     '''Cast @value to int, making sure it's greater than @minim. If not, return
     @default.
@@ -182,20 +174,23 @@ def show_src_pkg(b, pkg):
     branch = branches[b]
     return dict(branch=branch, src=branch.get_src_pkg(pkg))
 
-@route("/search/<keyword>")
+@route("/search/<b:re:(stable|qa)>/package/<keyword>")
 @view("searchpkg")
-def search_pkg(keyword):
+def search_pkg(b, keyword):
     start, limit = get_pagination(request.query)
-    keyword, branch = parse_search_term(keyword, request.query)
+    keyword = keyword.decode("utf8")
+    branch = branches[b]
     pkgs, total = branch.search_pkg(keyword, start, limit)
     return dict(pkgs=pkgs, total=total, keyword=keyword, branch=branch,
             start=start, limit=limit)
 
-@route("/search/file/<keyword:path>")
+@route("/search/<b:re:(stable|qa)>/<searchon:re:file/<keyword>")
+@route("/search/<b:re:(stable|qa)>/<searchon:re:path/<keyword:path>")
 @view("searchfile")
-def search_file(keyword):
-    keyword, branch = parse_search_term(keyword, request.query)
-    if request.query.mode == "fullpath":
+def search_file(b, keyword):
+    keyword = keyword.decode("utf8")
+    branch = branches[b]
+    if searchon == "path":
         files = branch.search_file(keyword)
     else:
         files = branch.search_file(keyword, only_basename=True)
@@ -203,22 +198,19 @@ def search_file(keyword):
 
 @route("/search", method="POST")
 def receive_search():
-    query = ""
     b = request.forms.branch
-    if b in branches and b != "qa":
-        query = "?branch=%s" % b
+    if not b in branches:
+        b = "qa"
 
+    keyword = request.forms.keyword.encode("utf8")
     if request.forms.searchtype == "file":
         # search only filename or fullpath
         if request.forms.mode == "fullpath":
-            if "?" not in query:
-                query += "?"
-            else:
-                query += "&"
-            query += "mode=fullpath"
-        redirect("/search/file/%s%s" % (request.forms.keyword.encode("utf8"), query))
+            redirect("/search/%s/file/%s" % (b, keyword))
+        else:
+            redirect("/search/%s/path/%s" % (b, keyword))
     else:
-        redirect("/search/%s%s" % (request.forms.keyword.encode("utf8"), query))
+        redirect("/search/%s/package/%s" % (b, keyword))
 
 @route("/static/<filename:path>")
 def serve_static(filename):
