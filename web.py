@@ -130,6 +130,9 @@ def get_value_gt(value, minim, default):
 
 def get_pagination(query):
     '''Get pagination info. Return requested start and limit
+
+    start is counted from 1 here (and in the views). But in the db and in
+    Branch it's from 0.
     '''
     start = get_value_gt(request.query.start, minim=1, default=1)
     limit = get_value_gt(request.query.limit, minim=1, default=50)
@@ -194,14 +197,14 @@ def search_pkg(b, keyword):
     start, limit = get_pagination(request.query)
     keyword = keyword.decode("utf8")
     branch = branches[b]
-    pkgs, total = branch.search_pkg(keyword, start, limit)
+    pkgs, total = branch.search_pkg(keyword, start - 1, limit)
     return dict(pkgs=pkgs, total=total, keyword=keyword, branch=branch,
             start=start, limit=limit)
 
-@route("/search/%s/<searchon:re:file/<keyword>" % url_branches)
-@route("/search/%s/<searchon:re:path/<keyword:path>" % url_branches)
+@route("/search/%s/<searchon:re:file>/<keyword>" % url_branches)
+@route("/search/%s/<searchon:re:path>/<keyword:path>" % url_branches)
 @view("searchfile")
-def search_file(b, keyword):
+def search_file(b, searchon, keyword):
     keyword = keyword.decode("utf8")
     branch = branches[b]
     if searchon == "path":
@@ -220,9 +223,9 @@ def receive_search():
     if request.forms.searchtype == "file":
         # search only filename or fullpath
         if request.forms.mode == "fullpath":
-            redirect("/search/%s/file/%s" % (b, keyword))
-        else:
             redirect("/search/%s/path/%s" % (b, keyword))
+        else:
+            redirect("/search/%s/file/%s" % (b, keyword))
     else:
         redirect("/search/%s/package/%s" % (b, keyword))
 
