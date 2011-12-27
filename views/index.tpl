@@ -17,12 +17,14 @@ our issue tracking system FITS.
 %for branch in branches:
   <dt><a href="/{{branch.name}}">View the packages in the {{branch.name}} branch</a>
     (<a href="/{{branch.name}}/source">view source packages</a>)</dt>
-  <dd>{{branch.description}}</dd>
+  <dd><p>{{branch.description}}</p></dd>
 %end
 </dl>
 
 <h2>Search package directories</h2>
 Search packages by name.
+
+<p>
 <form action="/search" method="post">
   <label for="kw">Keyword:</label>
   <input id="kw" type="text" name="keyword" //>
@@ -35,11 +37,13 @@ Search packages by name.
     <option value="devel">devel</option>
   </select>
 </form>
+</p>
 
 <h2>Search the contents of packages</h2>
 Search the contents of Foresight Linux distributions for any files that are
 part of packages. You can also get a full list of files in a given package.
 
+<p>
 <form action="/search" method="post">
   <label for="kw">Keyword:</label>
   <input id="kw" type="text" name="keyword" />
@@ -59,6 +63,7 @@ part of packages. You can also get a full list of files in a given package.
     <option value="devel">devel</option>
   </select>
 </form>
+</p>
 
 <div class="footer">
   Any issue with this website, please report to

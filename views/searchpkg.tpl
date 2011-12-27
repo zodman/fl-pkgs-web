@@ -1,7 +1,8 @@
 %rebase layout title="Package search result - %s in %s" % (keyword, branch.name)
 
 <p>
-You have searched for packages that names contain <em>{{keyword}}</em> in the <em>{{branch.name}}</em> branch.
+You have searched for packages that names contain <em>{{keyword}}</em> in the
+<em>{{branch.name}}</em> branch.
 </p>
 
 <p>

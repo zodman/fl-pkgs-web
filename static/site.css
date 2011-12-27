@@ -1,3 +1,14 @@
+p {
+  margin: 1.5em 0;
+}
+
+dt {
+  font-weight: bold;
+  margin: 1.5em 0 0;
+}
+dd {
+  margin: 0 0 0 1.5em;
+}
 table {
   border-bottom: 1px solid #A9ABB3;
   border-top: 1px solid #A9ABB3;
@@ -55,6 +66,7 @@ span.keyword {
 
 #navbar a:hover {
   background-color: #529431;
+  color: white;
 }
 
 #navbar a#current {
@@ -62,7 +74,7 @@ span.keyword {
 }
 
 #content {
-  margin: 0 10px 0 52px;
+  margin: 20px 10px 0 52px;
 }
 
 .footer {
