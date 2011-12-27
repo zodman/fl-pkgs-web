@@ -99,6 +99,18 @@ class Branch:
         pkgs = [Package(pkg) for pkg in pkgs]
         return pkgs, total
 
+    def search_src_pkg(self, keyword, skip=0, limit=50):
+        if keyword.endswith(":source"):
+            keyword = keyword.split(":")[0]
+        keyword += ".*:source"
+        pkgs = self._src_pkgs.find(
+                {"name": re.compile(keyword, re.IGNORECASE)},
+                skip=skip, limit=limit,
+                sort=[("name", pymongo.ASCENDING)])
+        total = pkgs.count()
+        pkgs = [SourceTrove(pkg) for pkg in pkgs]
+        return pkgs, total
+
     def search_file(self, keyword, searchon="path"):
         '''@searchon can be path, filename or fullpath. Default is path,
         searching for path ending with @keyword.
@@ -200,15 +212,18 @@ def show_src_pkg(b, pkg):
         abort(404, "No found")
     return dict(branch=branch, src=src)
 
-@route("/search/%s/package/<keyword>" % url_branches)
+@route("/search/%s/<searchon:re:(package|source)>/<keyword>" % url_branches)
 @view("searchpkg")
-def search_pkg(b, keyword):
+def search_pkg(b, searchon, keyword):
     start, limit = get_pagination(request.query)
     keyword = keyword.decode("utf8")
     branch = branches[b]
-    pkgs, total = branch.search_pkg(keyword, start - 1, limit)
-    return dict(pkgs=pkgs, total=total, keyword=keyword, branch=branch,
-            start=start, limit=limit)
+    if searchon == "source":
+        pkgs, total = branch.search_src_pkg(keyword, start - 1, limit)
+    else:
+        pkgs, total = branch.search_pkg(keyword, start - 1, limit)
+    return dict(pkgs=pkgs, total=total, keyword=keyword, searchon=searchon,
+            branch=branch, start=start, limit=limit)
 
 @route("/search/%s/<searchon:re:filename>/<keyword>" % url_branches)
 @route("/search/%s/<searchon:re:(fullpath|path)>/<keyword:path>" % url_branches)
@@ -226,12 +241,16 @@ def receive_search():
         b = "qa"
 
     keyword = request.forms.keyword.encode("utf8")
-    if request.forms.searchtype == "file":
-        if request.forms.mode not in ("path", "filename", "fullpath"):
-            request.forms.mode = "path"
-        redirect("/search/%s/%s/%s" % (b, request.forms.mode, keyword))
-    else:
-        redirect("/search/%s/package/%s" % (b, keyword))
+
+    searchtype = request.forms.searchtype
+    mode = request.forms.mode
+    if searchtype == "file":
+        if mode not in ("path", "filename", "fullpath"):
+            mode = "path"
+    else: # search for pkg
+        if mode not in ("source", "package"):
+            mode = "package"
+    redirect("/search/%s/%s/%s" % (b, mode, keyword))
 
 @route("/static/<filename:path>")
 def serve_static(filename):

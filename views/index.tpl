@@ -30,6 +30,12 @@ Search packages by name.
   <input id="kw" type="text" name="keyword" //>
   <input type="submit" value="Search" />
   <br />
+  Search on:
+  <input id="searchbin" type="radio" checked="checked" value="package" name="mode">
+  <label for="searchbin">Package names only</label>
+  <input id="searchsrc" type="radio" value="source" name="mode">
+  <label for="searchsrc">Source package names</label>
+  <br/>
   <label for="branch">Branch:</label>
   <select id="branch" name="branch">
     <option value="stable">stable</option>
