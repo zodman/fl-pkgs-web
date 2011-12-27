@@ -32,8 +32,17 @@
 
 * requirement:
   - bottle
-  - gevent
+  - gevent (can be easily replaced)
+  - mongodb and pymongo
 
-* data size (included labels: fl:2, fl:2-kernel, fl:2-qa, fl:2-qa-kernel):
-  - rawdata 2.8G
-  - info 85M
+* cached data size
+  - included labels: fl:2, fl:2-kernel, fl:2-qa, fl:2-qa-kernel, fl:2-devel,
+    fl:2-devel-kernel
+  - 2.9G    rawdata
+
+* database size:
+  -  65M fl_pkgs.0
+  - 129M fl_pkgs.1
+  - 257M fl_pkgs.2
+  - 513M fl_pkgs.3
+  -  17M fl_pkgs.ns
