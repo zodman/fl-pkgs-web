@@ -11,6 +11,7 @@
 in the <em>{{branch.name}}</em> branch. Found <strong>{{len(files)}} results</strong>:
 </p>
 
+%if files:
 <table>
 <tr><th>File</th><th>Package</th></tr>
 %for (path, pkg) in files:
@@ -20,3 +21,4 @@ in the <em>{{branch.name}}</em> branch. Found <strong>{{len(files)}} results</st
   </tr>
 %end
 </table>
+%end

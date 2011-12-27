@@ -1,4 +1,4 @@
-import os, time, re
+import os, time, re, urllib
 
 import pymongo
 from bottle import route, run, view, abort, request, redirect, static_file
@@ -240,7 +240,7 @@ def receive_search():
     if not b in branches:
         b = "qa"
 
-    keyword = request.forms.keyword.encode("utf8")
+    keyword = urllib.quote(request.forms.keyword.encode("utf8"))
 
     searchtype = request.forms.searchtype
     mode = request.forms.mode
