@@ -1,8 +1,14 @@
 %rebase layout title="File search result - %s in %s" % (keyword, branch.name)
 
 <p>
-You have searched for files that names contain <em>{{keyword}}</em> in the
-<em>{{branch.name}}</em> branch. Found <strong>{{len(files)}} results</strong>:
+%if searchon == "path":
+  You have searched for paths that end with <em>{{keyword}}</em>,
+%elif searchon == "filename":
+  You have searched for files that contain <em>{{keyword}}</em> in the name,
+%elif searchon == "fullpath":
+  You have searched for paths that contain <em>{{keyword}}</em>,
+%end
+in the <em>{{branch.name}}</em> branch. Found <strong>{{len(files)}} results</strong>:
 </p>
 
 <table>

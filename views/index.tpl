@@ -45,16 +45,21 @@ part of packages. You can also get a full list of files in a given package.
 
 <p>
 <form action="/search" method="post">
+  <input type="hidden" name="searchtype" value="file"/>
   <label for="kw">Keyword:</label>
   <input id="kw" type="text" name="keyword" />
   <input type="submit" value="Search" />
   <br />
-  <input type="hidden" name="searchtype" value="file"/>
-  <label for="searchfile">search in filenames</label>
-  <input id="searchfile" type="radio" value="filename" name="mode" checked="checked" />
+  Display:
   <br />
-  <label for="searchpath">search in full path</label>
+  <input id="searchpathending" type="radio" value="pathending" name="mode" checked="checked" />
+  <label for="searchpathending">paths ending with the keyword</label>
+  <br />
+  <input id="searchfile" type="radio" value="filename" name="mode" />
+  <label for="searchfile">filenames containing the keyword</label>
+  <br />
   <input id="searchpath" type="radio" value="fullpath" name="mode" />
+  <label for="searchpath">paths containing the keyword</label>
   <br />
   <label for="branch">Branch:</label>
   <select id="branch" name="branch">

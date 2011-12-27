@@ -99,13 +99,22 @@ class Branch:
         pkgs = [Package(pkg) for pkg in pkgs]
         return pkgs, total
 
-    def search_file(self, keyword, only_basename=False):
+    def search_file(self, keyword, searchon="path"):
+        '''@searchon can be path, filename or fullpath. Default is path,
+        searching for path ending with @keyword.
+
+        These searchon terms are referenced in several places. Don't forget to
+        change them together.
+        '''
         # needs rethinking
+        keyword = keyword.lower()
         ret = []
-        if only_basename:
-            func = lambda path: keyword.lower() in path.rsplit("/")[-1].lower()
+        if searchon == "fullpath":
+            func = lambda path: keyword in path.lower()
+        elif searchon == "filename":
+            func = lambda path: keyword in path.rsplit("/")[-1].lower()
         else:
-            func = lambda path: keyword.lower() in path.lower()
+            func = lambda path: path.lower().endswith(keyword)
         for pkg in self._bin_pkgs.find():
             ret.extend([(path, Package(pkg)) for path in pkg["filelist"]
                 if func(path)])
@@ -201,17 +210,14 @@ def search_pkg(b, keyword):
     return dict(pkgs=pkgs, total=total, keyword=keyword, branch=branch,
             start=start, limit=limit)
 
-@route("/search/%s/<searchon:re:file>/<keyword>" % url_branches)
-@route("/search/%s/<searchon:re:path>/<keyword:path>" % url_branches)
+@route("/search/%s/<searchon:re:filename>/<keyword>" % url_branches)
+@route("/search/%s/<searchon:re:(fullpath|path)>/<keyword:path>" % url_branches)
 @view("searchfile")
 def search_file(b, searchon, keyword):
     keyword = keyword.decode("utf8")
     branch = branches[b]
-    if searchon == "path":
-        files = branch.search_file(keyword)
-    else:
-        files = branch.search_file(keyword, only_basename=True)
-    return dict(files=files, keyword=keyword, branch=branch)
+    files = branch.search_file(keyword, searchon=searchon)
+    return dict(files=files, keyword=keyword, searchon=searchon, branch=branch)
 
 @route("/search", method="POST")
 def receive_search():
@@ -221,11 +227,9 @@ def receive_search():
 
     keyword = request.forms.keyword.encode("utf8")
     if request.forms.searchtype == "file":
-        # search only filename or fullpath
-        if request.forms.mode == "fullpath":
-            redirect("/search/%s/path/%s" % (b, keyword))
-        else:
-            redirect("/search/%s/file/%s" % (b, keyword))
+        if request.forms.mode not in ("path", "filename", "fullpath"):
+            request.forms.mode = "path"
+        redirect("/search/%s/%s/%s" % (b, request.forms.mode, keyword))
     else:
         redirect("/search/%s/package/%s" % (b, keyword))
 
