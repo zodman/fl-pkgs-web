@@ -74,10 +74,10 @@ class Branch:
         if pkg:
             return Package(pkg)
         else:
-            abort(404, "No such page")
+            return None
 
     def get_src_pkg(self, name):
-        '''Could raise KeyError
+        '''Could return None
         '''
         if not ":" in name:
             name += ":source"
@@ -89,7 +89,7 @@ class Branch:
             pkg["binpkgs"] = [Package(p) for p in binpkgs]
             return SourceTrove(pkg)
         else:
-            abort(404, "No such page")
+            return None
 
     def search_pkg(self, keyword, skip=0, limit=50):
         pkgs = self._bin_pkgs.find({"name": re.compile(keyword, re.IGNORECASE)},
@@ -165,19 +165,28 @@ def show_branch_sources(b):
 @view("pkg")
 def show_pkg(b, pkg):
     branch = branches[b]
-    return dict(branch=branch, pkg=branch.get_pkg(pkg))
+    pkg = branch.get_pkg(pkg)
+    if not pkg:
+        abort(404, "No found")
+    return dict(branch=branch, pkg=pkg)
 
 @route("/%s/<pkg>/filelist" % url_branches)
 @view("filelist")
 def show_pkg_filelist(b, pkg):
     branch = branches[b]
-    return dict(branch=branch, pkg=branch.get_pkg(pkg, with_filelist=True))
+    pkg = branch.get_pkg(pkg, with_filelist=True)
+    if not pkg:
+        abort(404, "No found")
+    return dict(branch=branch, pkg=pkg)
 
 @route("/%s/source/<pkg>" % url_branches)
 @view("srcpkg")
 def show_src_pkg(b, pkg):
     branch = branches[b]
-    return dict(branch=branch, src=branch.get_src_pkg(pkg))
+    src = branch.get_src_pkg(pkg)
+    if not src:
+        abort(404, "No found")
+    return dict(branch=branch, src=src)
 
 @route("/search/%s/package/<keyword>" % url_branches)
 @view("searchpkg")
