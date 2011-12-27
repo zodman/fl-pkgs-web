@@ -11,6 +11,15 @@
 in the <em>{{branch.name}}</em> branch. Found <strong>{{len(files)}} results</strong>:
 </p>
 
+%if truncated:
+<div class="note">
+<p>
+Note: Your search was too wide so we will only display the first 100 matches.
+Please consider using a longer keyword.
+</p>
+</div>
+%end
+
 %if files:
 <table>
 <tr><th>File</th><th>Package</th></tr>

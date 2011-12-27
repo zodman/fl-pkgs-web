@@ -117,10 +117,14 @@ class Branch:
 
         These searchon terms are referenced in several places. Don't forget to
         change them together.
+
+        Return a list of (file, pkg) tuples, and a flag indicating whether the
+        search is completed or truncated.
         '''
         # needs rethinking
         keyword = keyword.lower()
         ret = []
+        truncated = False
         if searchon == "fullpath":
             func = lambda path: keyword in path.lower()
         elif searchon == "filename":
@@ -130,8 +134,11 @@ class Branch:
         for pkg in self._bin_pkgs.find():
             ret.extend([(path, Package(pkg)) for path in pkg["filelist"]
                 if func(path)])
+            if len(ret) >= 100:
+                truncated = True
+                break
         ret.sort(key=lambda tup: tup[0])
-        return ret
+        return ret, truncated
 
 branches = {}
 
@@ -231,8 +238,9 @@ def search_pkg(b, searchon, keyword):
 def search_file(b, searchon, keyword):
     keyword = keyword.decode("utf8")
     branch = branches[b]
-    files = branch.search_file(keyword, searchon=searchon)
-    return dict(files=files, keyword=keyword, searchon=searchon, branch=branch)
+    files, truncated = branch.search_file(keyword, searchon=searchon)
+    return dict(files=files, keyword=keyword, searchon=searchon, branch=branch,
+            truncated=truncated)
 
 @route("/search", method="POST")
 def receive_search():

@@ -80,3 +80,12 @@ span.keyword {
 .footer {
   font-size: 0.75em;
 }
+
+div.note {
+  background-color: #FFFFCB;
+  border: 0.15em solid #CCCCA3;
+  font-size: 0.75em;
+  line-height: 2em;
+  margin: 1.85em 0;
+  padding: 0 2em 0 4em;
+}
