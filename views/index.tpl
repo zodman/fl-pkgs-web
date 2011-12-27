@@ -32,6 +32,7 @@ Search packages by name.
   <select id="branch" name="branch">
     <option value="stable">stable</option>
     <option selected="selected" value="qa">qa</option>
+    <option value="devel">devel</option>
   </select>
 </form>
 
@@ -55,6 +56,7 @@ part of packages. You can also get a full list of files in a given package.
   <select id="branch" name="branch">
     <option value="stable">stable</option>
     <option selected="selected" value="qa">qa</option>
+    <option value="devel">devel</option>
   </select>
 </form>
 

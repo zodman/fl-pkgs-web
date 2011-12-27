@@ -114,6 +114,8 @@ class Branch:
 
 branches = {}
 
+url_branches = "<b:re:(stable|qa|devel)>"
+
 def get_value_gt(value, minim, default):
     '''Cast @value to int, making sure it's greater than @minim. If not, return
     @default.
@@ -136,9 +138,12 @@ def get_pagination(query):
 @route("/")
 @view("index")
 def index():
-    return dict(branches=branches.values())
+    order = {"stable": 0, "qa": 1, "devel": 2}
+    bs = branches.values()
+    bs = sorted(bs, key=lambda b: order[b.name])
+    return dict(branches=bs)
 
-@route("/<b:re:(stable|qa)>")
+@route("/%s" % url_branches)
 @view("branch")
 def show_branch(b):
     start, limit = get_pagination(request.query)
@@ -146,7 +151,7 @@ def show_branch(b):
     pkgs = branch.get_pkgs(start - 1, limit)
     return dict(branch=branch, pkgs=pkgs, start=start, limit=limit)
 
-@route("/<b:re:(stable|qa)>/source")
+@route("/%s/source" % url_branches)
 @view("branch-sources")
 def show_branch_sources(b):
     '''List :source packages
@@ -156,25 +161,25 @@ def show_branch_sources(b):
     pkgs = branch.get_src_pkgs(start - 1, limit)
     return dict(branch=branch, pkgs=pkgs, start=start, limit=limit)
 
-@route("/<b:re:(stable|qa)>/<pkg>")
+@route("/%s/<pkg>" % url_branches)
 @view("pkg")
 def show_pkg(b, pkg):
     branch = branches[b]
     return dict(branch=branch, pkg=branch.get_pkg(pkg))
 
-@route("/<b:re:(stable|qa)>/<pkg>/filelist")
+@route("/%s/<pkg>/filelist" % url_branches)
 @view("filelist")
 def show_pkg_filelist(b, pkg):
     branch = branches[b]
     return dict(branch=branch, pkg=branch.get_pkg(pkg, with_filelist=True))
 
-@route("/<b:re:(stable|qa)>/source/<pkg>")
+@route("/%s/source/<pkg>" % url_branches)
 @view("srcpkg")
 def show_src_pkg(b, pkg):
     branch = branches[b]
     return dict(branch=branch, src=branch.get_src_pkg(pkg))
 
-@route("/search/<b:re:(stable|qa)>/package/<keyword>")
+@route("/search/%s/package/<keyword>" % url_branches)
 @view("searchpkg")
 def search_pkg(b, keyword):
     start, limit = get_pagination(request.query)
@@ -184,8 +189,8 @@ def search_pkg(b, keyword):
     return dict(pkgs=pkgs, total=total, keyword=keyword, branch=branch,
             start=start, limit=limit)
 
-@route("/search/<b:re:(stable|qa)>/<searchon:re:file/<keyword>")
-@route("/search/<b:re:(stable|qa)>/<searchon:re:path/<keyword:path>")
+@route("/search/%s/<searchon:re:file/<keyword>" % url_branches)
+@route("/search/%s/<searchon:re:path/<keyword:path>" % url_branches)
 @view("searchfile")
 def search_file(b, keyword):
     keyword = keyword.decode("utf8")
@@ -230,5 +235,8 @@ if __name__ == "__main__":
             brave users who want to help with Foresight Linux development. \
             For various reasons, this branch is also used for official \
             releases.", "fl:2-qa", db)
+    branches["devel"] = Branch("devel", "This is the devel branch, where \
+            Foresight Linux development happens. All binary packages are \
+            built against this branch.", "fl:2-devel", db)
 
     run(server='gevent', host="0.0.0.0", port=int(os.environ.get('PORT', 5000)))
