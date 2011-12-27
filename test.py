@@ -9,7 +9,7 @@ test_label = convert.Label([test_b], cache="datatest", read_pkg_details=False)
 
 class TestXMLConvert(unittest.TestCase):
     def test_read_pkg_list(self):
-        self.assertEqual(3503, len(test_label.get_pkgs()))
+        self.assertEqual(3578, len(test_label.get_pkgs()))
 
     def test_src_pkg_list(self):
         self.assertEqual(2269, len(test_label.get_src_pkgs()))
@@ -64,8 +64,10 @@ class TestXMLConvert(unittest.TestCase):
     def test_more_than_2_flavors(self):
         pkg = test_label.get_pkg("gnucash")
         pkg.read_info(with_filelist=False)
-        self.assertEqual(["~builddocs is: x86", "~!builddocs is: x86",
-            "~builddocs is: x86_64", "~!builddocs is: x86_64"], pkg.flavors)
+        self.assertEqual(
+                sorted(["~builddocs is: x86", "~!builddocs is: x86",
+                    "~builddocs is: x86_64", "~!builddocs is: x86_64"]),
+                sorted(pkg.flavors))
 
 class TestFilelistParser(unittest.TestCase):
     def test_read_filelist(self):
