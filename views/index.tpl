@@ -7,8 +7,8 @@ Bonjour! Here you can find information about packages from the Foresight Linux
 repository.
 </p>
 <p>
-Any issues you spot, please kindly let us know through the forum or
-our issue tracking system FITS.
+Any issues you spot, let us know through the forum or the issue tracking system
+FITS.
 </p>
 
 <h2>View package lists</h2>
@@ -22,38 +22,40 @@ our issue tracking system FITS.
 </dl>
 
 <h2>Search package directories</h2>
-Search packages by name.
+<p>Search packages by name.</p>
 
-<p>
 <form action="/search" method="post">
-  <label for="kw">Keyword:</label>
-  <input id="kw" type="text" name="keyword" //>
+<fieldset>
+  <label for="pkw">Keyword:</label>
+  <input id="pkw" type="text" name="keyword" />
   <input type="submit" value="Search" />
   <br />
   Search on:
-  <input id="searchbin" type="radio" checked="checked" value="package" name="mode">
+  <input id="searchbin" type="radio" checked="checked" value="package" name="mode"/>
   <label for="searchbin">Package names only</label>
-  <input id="searchsrc" type="radio" value="source" name="mode">
+  <input id="searchsrc" type="radio" value="source" name="mode"/>
   <label for="searchsrc">Source package names</label>
   <br/>
-  <label for="branch">Branch:</label>
-  <select id="branch" name="branch">
+  <label for="pbranch">Branch:</label>
+  <select id="pbranch" name="branch">
     <option value="stable">stable</option>
     <option selected="selected" value="qa">qa</option>
     <option value="devel">devel</option>
   </select>
+</fieldset>
 </form>
-</p>
 
 <h2>Search the contents of packages</h2>
+<p>
 Search the contents of Foresight Linux distributions for any files that are
 part of packages. You can also get a full list of files in a given package.
+</p>
 
-<p>
 <form action="/search" method="post">
+<fieldset>
   <input type="hidden" name="searchtype" value="file"/>
-  <label for="kw">Keyword:</label>
-  <input id="kw" type="text" name="keyword" />
+  <label for="fkw">Keyword:</label>
+  <input id="kfw" type="text" name="keyword" />
   <input type="submit" value="Search" />
   <br />
   Display:
@@ -67,14 +69,14 @@ part of packages. You can also get a full list of files in a given package.
   <input id="searchpath" type="radio" value="fullpath" name="mode" />
   <label for="searchpath">paths containing the keyword</label>
   <br />
-  <label for="branch">Branch:</label>
-  <select id="branch" name="branch">
+  <label for="fbranch">Branch:</label>
+  <select id="fbranch" name="branch">
     <option value="stable">stable</option>
     <option selected="selected" value="qa">qa</option>
     <option value="devel">devel</option>
   </select>
+</fieldset>
 </form>
-</p>
 
 <div class="footer">
   Any issue with this website, please report to

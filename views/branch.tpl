@@ -1,6 +1,6 @@
 %rebase layout title="Packages in %s branch" % branch.name
 
-<h1>Software Packages in the <b>{{branch.name}}</b> branch</h2>
+<h1>Software Packages in the <b>{{branch.name}}</b> branch</h1>
 
 <p>
 Showing {{start}}-{{min(start + limit - 1, branch.count_binpkgs())}} of {{branch.count_binpkgs()}}:
