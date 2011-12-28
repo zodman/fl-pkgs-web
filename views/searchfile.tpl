@@ -8,7 +8,7 @@
 %elif searchon == "fullpath":
   You have searched for paths that contain <em>{{keyword}}</em>,
 %end
-in the <em>{{branch.name}}</em> branch. Found <strong>{{len(files)}} results</strong>:
+in the <em>{{branch.name}}</em> branch. {{"Showing" if truncated else "Found"}} <strong>{{len(files)}} results</strong>:
 </p>
 
 %if truncated:

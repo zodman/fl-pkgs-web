@@ -136,6 +136,7 @@ class Branch:
                 if func(path)])
             if len(ret) >= 100:
                 truncated = True
+                ret = ret[:100]
                 break
         ret.sort(key=lambda tup: tup[0])
         return ret, truncated
