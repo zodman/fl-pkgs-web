@@ -210,28 +210,23 @@ class Label:
     def get_pkg(self, name):
         return self._bin_pkgs[name]
 
-    def to_dict(self):
-        return {
-            "binpkgs": [pkg.to_dict() for pkg in self.get_pkgs()],
-            "srcpkgs": [pkg.to_dict() for pkg in self.get_src_pkgs()]}
-
 def write_info(db, label):
-    data = label.to_dict()
-
     # not sure about the schema. for now use twe separate collections for
     # binary and source pkgs
 
     print "storing %s binary pkgs" % label.branch
     coll = db[label.branch + ":binary"]
     coll.ensure_index("name")
-    for pkg in data["binpkgs"]:
+    for pkg in label.get_pkgs():
+        pkg = pkg.to_dict()
         pkg["_id"] = pkg["name"] # use pkg name as id
         coll.save(pkg)
 
     print "storing %s source pkgs" % label.branch
     coll = db[label.branch + ":source"]
     coll.ensure_index("name")
-    for pkg in data["srcpkgs"]:
+    for pkg in label.get_src_pkgs():
+        pkg = pkg.to_dict()
         pkg["_id"] = pkg["name"] # use pkg name as id
         coll.save(pkg)
 
