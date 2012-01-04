@@ -1,4 +1,5 @@
 import os, json
+
 from lxml import etree
 import pymongo
 
@@ -31,7 +32,7 @@ def read_trove_filelist(fname):
     '''
     f = open(fname)
     content = f.read()
-    f.close
+    f.close()
 
     ret = []
     xml = etree.XML(content)
@@ -212,7 +213,7 @@ class Label:
         return self._src_pkgs.get(name, None)
 
 def write_info(db, label):
-    # not sure about the schema. for now use twe separate collections for
+    # not sure about the schema. for now use two separate collections for
     # binary and source pkgs
 
     print "storing %s binary pkgs" % label.branch
