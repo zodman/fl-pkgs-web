@@ -200,39 +200,40 @@ class Label:
             pkg = Package(pkg, "%s/%s" % (self.cache, label.split("@")[1]))
             self.bin_pkgs[pkg.name] = pkg
 
-    def get_pkgs(self):
-        return self.bin_pkgs.values()
-
-    def get_src_pkgs(self):
-        return self.src_pkgs.values()
-
-    def get_pkg(self, name):
-        return self.bin_pkgs.get(name, None)
-
-    def get_src_pkg(self, name):
-        return self.src_pkgs.get(name, None)
-
 def write_info(db, label):
     # not sure about the schema. for now use two separate collections for
     # binary and source pkgs
 
-    print "storing %s binary pkgs" % label.branch
     coll = db[label.branch + ":binary"]
     coll.ensure_index("name")
-    for pkg in label.get_pkgs():
+    print "storing %s binary pkgs. %d in total. Current db has %d." % (
+            label.branch, len(label.bin_pkgs), coll.count())
+    for pkg in coll.find():
+        if not pkg["name"] in label.bin_pkgs:
+            print " removing %s" % pkg["name"]
+            coll.remove({"_id": pkg["name"]})
+    n = 0
+    for pkg in label.bin_pkgs.values():
         existing = coll.find_one({"name": pkg.name})
         if existing and existing["revision"] == pkg.revision:
             continue
         pkg = pkg.to_dict()
-        if not label.get_src_pkg(pkg["source"]):
+        if not label.src_pkgs.get(pkg["source"], None):
             continue
         pkg["_id"] = pkg["name"] # use pkg name as id
         coll.save(pkg)
+        n += 1
+    print " %d pkgs written." % n
 
-    print "storing %s source pkgs" % label.branch
     coll = db[label.branch + ":source"]
     coll.ensure_index("name")
-    for pkg in label.get_src_pkgs():
+    print "storing %s source pkgs. %d in total. Current db has %d." % (
+            label.branch, len(label.src_pkgs), coll.count())
+    for pkg in coll.find():
+        if not pkg["name"] in label.src_pkgs:
+            print " removing %s" % pkg["name"]
+            coll.remove({"_id": pkg["name"]})
+    for pkg in label.src_pkgs.values():
         pkg = pkg.to_dict()
         pkg["_id"] = pkg["name"] # use pkg name as id
         coll.save(pkg)
