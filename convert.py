@@ -172,8 +172,8 @@ class Label:
         '''
         self.branch = labels[0].split("@")[1]
         self.cache = cache
-        self._src_pkgs = {}
-        self._bin_pkgs = {}
+        self.src_pkgs = {}
+        self.bin_pkgs = {}
 
         for b in labels:
             self._read_src_pkgs(b)
@@ -189,7 +189,7 @@ class Label:
             pkg = SourceTrove(e)
             if pkg.revision.startswith("0-"):
                 continue
-            self._src_pkgs[pkg.name] = pkg
+            self.src_pkgs[pkg.name] = pkg
 
     def _read_bin_pkgs(self, label):
         f = open("%s/%s" % (self.cache, label))
@@ -198,19 +198,19 @@ class Label:
 
         for pkg in pkgs:
             pkg = Package(pkg, "%s/%s" % (self.cache, label.split("@")[1]))
-            self._bin_pkgs[pkg.name] = pkg
+            self.bin_pkgs[pkg.name] = pkg
 
     def get_pkgs(self):
-        return self._bin_pkgs.values()
+        return self.bin_pkgs.values()
 
     def get_src_pkgs(self):
-        return self._src_pkgs.values()
+        return self.src_pkgs.values()
 
     def get_pkg(self, name):
-        return self._bin_pkgs.get(name, None)
+        return self.bin_pkgs.get(name, None)
 
     def get_src_pkg(self, name):
-        return self._src_pkgs.get(name, None)
+        return self.src_pkgs.get(name, None)
 
 def write_info(db, label):
     # not sure about the schema. for now use two separate collections for

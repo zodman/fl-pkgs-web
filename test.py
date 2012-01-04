@@ -9,24 +9,24 @@ test_label = convert.Label([test_b], cache="datatest")
 
 class TestXMLConvert(unittest.TestCase):
     def test_read_pkg_list(self):
-        self.assertEqual(3578, len(test_label.get_pkgs()))
+        self.assertEqual(3578, len(test_label.bin_pkgs))
 
     def test_src_pkg_list(self):
-        self.assertEqual(2269, len(test_label.get_src_pkgs()))
+        self.assertEqual(2269, len(test_label.src_pkgs))
 
     def test_no_nil_pkg(self):
-        self.assertEqual(0, len([p for p in test_label.get_pkgs() if p.revision.startswith("0-")]))
-        self.assertEqual(0, len([p for p in test_label.get_src_pkgs() if p.revision.startswith("0-")]))
+        self.assertEqual(0, len([p for p in test_label.bin_pkgs.values() if p.revision.startswith("0-")]))
+        self.assertEqual(0, len([p for p in test_label.src_pkgs.values() if p.revision.startswith("0-")]))
 
     def test_label_get_pkg(self):
-        self.assertEqual(None, test_label.get_pkg("gitx"))
+        self.assertEqual(None, test_label.bin_pkgs.get("gitx", None))
 
     def test_src_pkg_info(self):
-        pkg = test_label.get_src_pkg("git:source")
+        pkg = test_label.src_pkgs["git:source"]
         self.assertEqual(pkg.revision, "1.7.7-1")
 
     def test_read_pkg_info(self):
-        pkg = test_label.get_pkg("git")
+        pkg = test_label.bin_pkgs["git"]
         pkg.read_info(with_filelist=False)
         self.assertEqual("git", pkg.name)
         self.assertEqual("1.7.7-1-1", pkg.revision)
@@ -47,22 +47,22 @@ class TestXMLConvert(unittest.TestCase):
             "git:supdoc"])
 
     def test_subpkg_has_correct_source(self):
-        pkg = test_label.get_pkg("git-svn")
+        pkg = test_label.bin_pkgs["git-svn"]
         pkg.read_info(with_filelist=False)
         self.assertEqual("git:source", pkg.source)
 
     def test_no_flavor_pkg(self):
-        pkg = test_label.get_pkg("wqy-zenhei")
+        pkg = test_label.bin_pkgs["wqy-zenhei"]
         pkg.read_info(with_filelist=False)
         self.assertEqual([None], pkg.flavors)
 
     def test_no_flavor_pkg(self):
-        pkg = test_label.get_pkg("wqy-zenhei")
+        pkg = test_label.bin_pkgs["wqy-zenhei"]
         pkg.read_info(with_filelist=False)
         self.assertEqual([None], pkg.flavors)
 
     def test_more_than_2_flavors(self):
-        pkg = test_label.get_pkg("gnucash")
+        pkg = test_label.bin_pkgs["gnucash"]
         pkg.read_info(with_filelist=False)
         self.assertEqual(
                 sorted(["~builddocs is: x86", "~!builddocs is: x86",
