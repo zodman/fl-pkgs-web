@@ -5,7 +5,7 @@ import unittest
 import convert
 
 test_b = "foresight.rpath.org@fl:2-qa"
-test_label = convert.Label([test_b], cache="datatest", read_pkg_details=False)
+test_label = convert.Label([test_b], cache="datatest")
 
 class TestXMLConvert(unittest.TestCase):
     def test_read_pkg_list(self):
@@ -19,10 +19,10 @@ class TestXMLConvert(unittest.TestCase):
         self.assertEqual(0, len([p for p in test_label.get_src_pkgs() if p.revision.startswith("0-")]))
 
     def test_label_get_pkg(self):
-        self.assertRaises(KeyError, test_label.get_pkg, "gitx")
+        self.assertEqual(None, test_label.get_pkg("gitx"))
 
     def test_src_pkg_info(self):
-        pkg = [p for p in test_label.get_src_pkgs() if p.name == "git:source"][0]
+        pkg = test_label.get_src_pkg("git:source")
         self.assertEqual(pkg.revision, "1.7.7-1")
 
     def test_read_pkg_info(self):

@@ -87,15 +87,20 @@ class Package:
         self.included = [] # list of names
         self.filelist = [] # list of files
 
+        self._info_complete = False
+
     def read_info(self, with_filelist=True):
         '''Read detailed information from cached data
         '''
+        if self._info_complete:
+            return
         f = open("%s/%s-%s" % (self.cache, self.name, self.revision))
         content = f.read()
         f.close()
         self._parse(etree.XML(content))
         if with_filelist:
             self._read_filelist()
+        self._info_complete = True
 
     def _parse(self, xml):
         info = TroveInfoParser(xml)
@@ -125,6 +130,7 @@ class Package:
         return "%s=%s" % (self.name, self.revision)
 
     def to_dict(self):
+        self.read_info()
         return {
             "name": self.name,
             "revision": self.revision,
@@ -151,7 +157,7 @@ class SourceTrove:
             }
 
 class Label:
-    def __init__(self, labels, cache, read_pkg_details=True):
+    def __init__(self, labels, cache):
         '''A Label is a container of one or more conary labels, which are
         always installed together (e.g. fl:2 and fl:2-kernel)
 
@@ -172,8 +178,6 @@ class Label:
             self._read_src_pkgs(b)
         for b in labels:
             self._read_bin_pkgs(b)
-        if read_pkg_details:
-            self._read_pkg_details()
 
     def _read_src_pkgs(self, label):
         f = open("%s/source-%s" % (self.cache, label))
@@ -195,12 +199,6 @@ class Label:
             pkg = Package(pkg, "%s/%s" % (self.cache, label.split("@")[1]))
             self._bin_pkgs[pkg.name] = pkg
 
-    def _read_pkg_details(self):
-        for k, pkg in self._bin_pkgs.items():
-            pkg.read_info()
-            if pkg.source not in self._src_pkgs:
-                del self._bin_pkgs[k]
-
     def get_pkgs(self):
         return self._bin_pkgs.values()
 
@@ -208,7 +206,10 @@ class Label:
         return self._src_pkgs.values()
 
     def get_pkg(self, name):
-        return self._bin_pkgs[name]
+        return self._bin_pkgs.get(name, None)
+
+    def get_src_pkg(self, name):
+        return self._src_pkgs.get(name, None)
 
 def write_info(db, label):
     # not sure about the schema. for now use twe separate collections for
@@ -218,7 +219,12 @@ def write_info(db, label):
     coll = db[label.branch + ":binary"]
     coll.ensure_index("name")
     for pkg in label.get_pkgs():
+        existing = coll.find_one({"name": pkg.name})
+        if existing and existing["revision"] == pkg.revision:
+            continue
         pkg = pkg.to_dict()
+        if not label.get_src_pkg(pkg["source"]):
+            continue
         pkg["_id"] = pkg["name"] # use pkg name as id
         coll.save(pkg)
 
