@@ -200,24 +200,28 @@ class Label:
             pkg = Package(pkg, "%s/%s" % (self.cache, label.split("@")[1]))
             self.bin_pkgs[pkg.name] = pkg
 
-def write_info(db, label):
-    # not sure about the schema. for now use two separate collections for
-    # binary and source pkgs
-
+# not sure about the schema. for now use two separate collections for
+# binary and source pkgs
+def write_bin_pkgs(db, label):
     coll = db[label.branch + ":binary"]
     coll.ensure_index("name")
     print "storing %s binary pkgs. %d in total. Current db has %d." % (
             label.branch, len(label.bin_pkgs), coll.count())
+
+    # remove pkgs not present in @label
     for pkg in coll.find():
         if not pkg["name"] in label.bin_pkgs:
             print " removing %s" % pkg["name"]
             coll.remove({"_id": pkg["name"]})
+
     n = 0
     for pkg in label.bin_pkgs.values():
         existing = coll.find_one({"name": pkg.name})
+        # whether the pkg has been changed
         if existing and existing["revision"] == pkg.revision:
             continue
         pkg = pkg.to_dict()
+        # skip if there is no corresponding :source
         if not label.src_pkgs.get(pkg["source"], None):
             continue
         pkg["_id"] = pkg["name"] # use pkg name as id
@@ -225,14 +229,18 @@ def write_info(db, label):
         n += 1
     print " %d pkgs written." % n
 
+def write_src_pkgs(db, label):
     coll = db[label.branch + ":source"]
     coll.ensure_index("name")
     print "storing %s source pkgs. %d in total. Current db has %d." % (
             label.branch, len(label.src_pkgs), coll.count())
+
+    # remove pkgs not present in @label
     for pkg in coll.find():
         if not pkg["name"] in label.src_pkgs:
             print " removing %s" % pkg["name"]
             coll.remove({"_id": pkg["name"]})
+
     for pkg in label.src_pkgs.values():
         pkg = pkg.to_dict()
         pkg["_id"] = pkg["name"] # use pkg name as id
@@ -251,7 +259,8 @@ def convert():
              "foresight.rpath.org@fl:2-devel-kernel"),
             ]:
         label = Label(b, cache)
-        write_info(db, label)
+        write_bin_pkgs(db, label)
+        write_src_pkgs(db, label)
 
 if __name__ == "__main__":
     convert()
