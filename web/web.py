@@ -241,7 +241,7 @@ def search_file(b, searchon, keyword):
     branch = branches[b]
     files, truncated = branch.search_file(keyword, searchon=searchon)
     return dict(files=files, keyword=keyword, searchon=searchon, branch=branch,
-            truncated=truncated)
+            truncated=truncated, re=re)
 
 @route("/search", method="POST")
 def receive_search():

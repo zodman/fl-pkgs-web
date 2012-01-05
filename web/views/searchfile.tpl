@@ -2,13 +2,17 @@
 
 <p>
 %if searchon == "path":
-  You have searched for paths that end with <em>{{keyword}}</em>,
+  You have searched for paths that end with
 %elif searchon == "filename":
-  You have searched for files that contain <em>{{keyword}}</em> in the name,
+  You have searched for filenames that contain
 %elif searchon == "fullpath":
-  You have searched for paths that contain <em>{{keyword}}</em>,
+  You have searched for paths that contain
 %end
-in the <em>{{branch.name}}</em> branch. {{"Showing" if truncated else "Found"}} <strong>{{len(files)}} results</strong>:
+<em>{{keyword.lower()}}</em>, in the <em>{{branch.name}}</em> branch.
+</p>
+
+<p>
+{{"Showing" if truncated else "Found"}} <strong>{{len(files)}} results</strong>:
 </p>
 
 %if truncated:
@@ -25,7 +29,7 @@ Please consider using a longer keyword.
 <tr><th>File</th><th>Package</th></tr>
 %for (path, pkg) in files:
   <tr>
-    <td class="file">{{!path.replace(keyword, "<span class=\"keyword\">%s</span>" % keyword)}}</td>
+    <td class="file">{{!re.sub(r"(?i)(%s)" % keyword, r'<span class="keyword">\1</span>', path)}}</td>
     <td><a href="/{{branch.name}}/{{pkg.name}}">{{pkg.name}}</a> ({{pkg.revision}})</td>
   </tr>
 %end

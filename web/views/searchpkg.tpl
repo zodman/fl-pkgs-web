@@ -6,7 +6,7 @@
 %else:
   You have searched for packages that
 %end
-contain <em>{{keyword}}</em> in the name, in the <em>{{branch.name}}</em> branch.
+contain <em>{{keyword.lower()}}</em> in the name, in the <em>{{branch.name}}</em> branch.
 </p>
 
 <p>
