@@ -69,6 +69,10 @@ class TestXMLConvert(unittest.TestCase):
                     "~builddocs is: x86_64", "~!builddocs is: x86_64"]),
                 sorted(pkg.flavors))
 
+    def test_source_correct_revision(self):
+        pkg = test_label.src_pkgs["Mesa:source"]
+        self.assertEqual(pkg.revision, "7.10.3-3")
+
 class TestFilelistParser(unittest.TestCase):
     def test_read_filelist(self):
         self.assertEqual(76,

@@ -150,6 +150,7 @@ class SourceTrove:
     def __init__(self, xml):
         self.name = xml.find("name").text
         self.revision = xml.find("version").find("revision").text
+        self.ordering = float(xml.find("version").find("ordering").text)
 
     def to_dict(self):
         return {
@@ -188,6 +189,9 @@ class Label:
         for e in etree.XML(content):
             pkg = SourceTrove(e)
             if pkg.revision.startswith("0-"):
+                continue
+            if pkg.name in self.src_pkgs and \
+                    self.src_pkgs[pkg.name].ordering > pkg.ordering:
                 continue
             self.src_pkgs[pkg.name] = pkg
 
