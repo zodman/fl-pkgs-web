@@ -262,6 +262,7 @@ def receive_search():
     redirect("/search/%s/%s/%s" % (b, mode, keyword))
 
 @route("/static/<filename:path>")
+@route("/<filename:re:robots.txt>")
 def serve_static(filename):
     return static_file(filename, root="static")
 
