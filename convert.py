@@ -208,12 +208,6 @@ def write_bin_pkgs(db, label):
     print "storing %s binary pkgs. %d in total. Current db has %d." % (
             label.branch, len(label.bin_pkgs), coll.count())
 
-    # remove pkgs not present in @label
-    for pkg in coll.find():
-        if not pkg["name"] in label.bin_pkgs:
-            print " removing %s" % pkg["name"]
-            coll.remove({"_id": pkg["name"]})
-
     n = 0
     for pkg in label.bin_pkgs.values():
         existing = coll.find_one({"name": pkg.name})
@@ -222,12 +216,20 @@ def write_bin_pkgs(db, label):
             continue
         pkg = pkg.to_dict()
         # skip if there is no corresponding :source
-        if not label.src_pkgs.get(pkg["source"], None):
+        src = label.src_pkgs.get(pkg["source"], None)
+        if not (src and pkg["revision"].startswith(src.revision)):
+            del label.bin_pkgs[pkg["name"]]
             continue
         pkg["_id"] = pkg["name"] # use pkg name as id
         coll.save(pkg)
         n += 1
     print " %d pkgs written." % n
+
+    # remove pkgs not present in @label
+    for pkg in coll.find():
+        if not pkg["name"] in label.bin_pkgs:
+            print " removing %s" % pkg["name"]
+            coll.remove({"_id": pkg["name"]})
 
 def write_src_pkgs(db, label):
     coll = db[label.branch + ":source"]
