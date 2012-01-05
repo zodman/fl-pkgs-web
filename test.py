@@ -12,7 +12,7 @@ class TestXMLConvert(unittest.TestCase):
         self.assertEqual(3578, len(test_label.bin_pkgs))
 
     def test_src_pkg_list(self):
-        self.assertEqual(2269, len(test_label.src_pkgs))
+        self.assertEqual(2265, len(test_label.src_pkgs))
 
     def test_no_nil_pkg(self):
         self.assertEqual(0, len([p for p in test_label.bin_pkgs.values() if p.revision.startswith("0-")]))
