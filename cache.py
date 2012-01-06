@@ -27,6 +27,40 @@ def cleanup_dir(dire, tokeep):
             log("removing %s" % t)
             os.remove(t)
 
+def collect_component_list(xml):
+    '''Collect name " from a <trovelist></trovelist>
+    '''
+    ret = [(t.find("name").text, t.get("id")) for t in xml.find("trovelist")]
+    return ret
+
+class TroveInfoParser:
+    def __init__(self, xml):
+        size = None
+        source = None
+        buildtime = None
+        # note: can be none
+        buildlog = None
+        included = []
+
+        for e in xml:
+            if e.tag == "size":
+                size = int(e.text)
+            elif e.tag == "source":
+                # only take trovelist[0]. There should always be only one :source.
+                source = e.find("trovelist")[0].find("name").text
+            elif e.tag == "buildtime":
+                buildtime = int(e.text)
+            elif e.tag == "buildlog":
+                buildlog = e.get("id")
+            elif e.tag == "included":
+                included = collect_component_list(e)
+
+        self.size = size
+        self.source = source
+        self.buildtime = buildtime
+        self.buildlog = buildlog
+        self.included = included
+
 class Package:
     def __init__(self, xmlelement):
         self.name = xmlelement.find("name").text
@@ -39,10 +73,31 @@ class Package:
     def fetch_details(self, destdir):
         f = "%s/%s-%s" % (destdir, self.name, self.revision)
         if not os.path.exists(f):
-            fetch_api_data(self.troveinfo, f)
+            content = fetch_api_data(self.troveinfo, f)
+            xml = etree.XML(content)
+        else:
+            xml = etree.parse(f).getroot()
+
+        info = TroveInfoParser(xml)
+        self.size = info.size
+        self.source = info.source
+        self.buildtime = info.buildtime
+        self.buildlog = info.buildlog
+        self.included = info.included
 
     def to_dict(self):
-        return dict(name=self.name, revision=self.revision, flavors=self.flavors)
+        return {
+            "name": self.name,
+            "revision": self.revision,
+            "flavors": self.flavors,
+            "size": self.size,
+            "source": self.source,
+            "buildtime": self.buildtime,
+            "buildlog": self.buildlog,
+            # note self.included contains tuple, while the exported dict
+            # contains just strings
+            "included": [name for (name, link) in self.included],
+            }
 
 def fetch_api_data(api, dest):
     '''Reading from url @api, and write to file @dest
@@ -98,57 +153,37 @@ def read_pkg_list(dest):
     f.close()
     return pkgs
 
-def fetch_component_info(link, f):
-    if os.path.exists(f):
+def fetch_component(trove, revision, link, destdir):
+    fname = "%s-%s" % (trove, revision)
+    dest = "%s/%s" % (destdir, fname)
+
+    if os.path.exists(dest):
         return
+
+    #### blacklist ####
+    blacklist = {
+            "fl:2": ("community-themes:data-0.13-3-2",
+                     "klavaro:data-1.2.1-1-1"),
+            "fl:2-qa": ("community-themes:data-0.13-3-3",
+                        "pitivi:locale-0.15.0-1-1",
+                        "pitivi:runtime-0.15.0-1-1"),
+            "fl:2-devel": ("community-themes:data-0.13-3-3",
+                        "pitivi:locale-0.15.0-1-1",
+                        "pitivi:runtime-0.15.0-1-1"),
+            }
+    if fname in blacklist.get(destdir.split("/")[-2], []):
+        log_error("skipping %s" % dest)
+        return
+    #### end ####
+
     try:
-        fetch_api_data(link, f)
+        fetch_api_data(link, dest)
     # sometimes there is UnicodeDecodeError: 'ascii' codec can't decode
     # byte 0xd0 in position 69: ordinal not in range(128).
     # reported to rpath/crest: https://issues.rpath.com/browse/BUGS-469
     except urllib2.HTTPError as e:
         if e.code == 500 and e.readline().startswith("UnicodeDecodeError"):
-            log_error("got UnicodeDecodeError. NOT writing %s" % f)
-
-def fetch_components_for_pkg(pkgfile, destdir):
-    '''Take a pkg info file, and fetch its components to destdir
-
-    Return all component files that have been cached, so we can do cleanup
-    later.
-    '''
-
-    ret = []
-
-    xml = etree.parse(pkgfile)
-    revision = xml.find("version").find("revision").text
-
-    included = [(t.find("name").text, t.get("id"))
-            for t in xml.find("included").find("trovelist")]
-    for trove, infolink in included:
-        if trove.endswith(":debuginfo") or trove.endswith(":test"):
-            continue
-        f = "%s-%s" % (trove, revision)
-
-        #### blacklist ####
-        blacklist = {
-                "fl:2": ("community-themes:data-0.13-3-2",
-                         "klavaro:data-1.2.1-1-1"),
-                "fl:2-qa": ("community-themes:data-0.13-3-3",
-                            "pitivi:locale-0.15.0-1-1",
-                            "pitivi:runtime-0.15.0-1-1"),
-                "fl:2-devel": ("community-themes:data-0.13-3-3",
-                            "pitivi:locale-0.15.0-1-1",
-                            "pitivi:runtime-0.15.0-1-1"),
-                }
-        if f in blacklist.get(destdir.split("/")[-2], []):
-            log_error("skipping %s/%s" % (destdir, f))
-            continue
-        #### end ####
-
-        ret.append(f)
-        fetch_component_info(infolink, "%s/%s" % (destdir, f))
-
-    return ret
+            log_error("got UnicodeDecodeError. NOT writing %s" % dest)
 
 def refresh_pkg_list(api_site, label, cachedir):
     '''Fetch the list of pkgs
@@ -175,12 +210,14 @@ def refresh_pkg_list(api_site, label, cachedir):
     tokeep = ["%s-%s" % (p.name, p.revision) for p in pkgs.values()]
     cleanup_dir(destdir, tokeep)
 
+    return pkgs
+
 def refresh_source_list(api_site, label, cachedir):
     api = "%s/trove?label=%s&type=source" % (api_site, label)
     dest = "%s/source-%s" % (cachedir, label)
     fetch_api_data(api, dest)
 
-def refresh_components(labeldir):
+def refresh_components(pkgs, labeldir):
     '''Fetch info of components for all pkgs on a label
 
     The components will be cached in the 'components' subdir.
@@ -188,17 +225,20 @@ def refresh_components(labeldir):
     destdir = "%s/components" % labeldir
     mkdir(destdir)
 
-    tokeep = []
-    for fname in os.listdir(labeldir):
-        if fname.startswith("group-"):
+    comps = []
+    for name, pkg in pkgs.items():
+        if name.startswith("group-"):
             continue
-        path = "%s/%s" % (labeldir, fname)
-        if not ("-" in fname and os.path.isfile(path)):
-            continue
+        for trove, link in pkg.included:
+            if trove.endswith(":debuginfo") or trove.endswith(":test"):
+                continue
+            comps.append((trove, pkg.revision, link))
 
-        comps = fetch_components_for_pkg(path, destdir)
-        tokeep.extend(comps)
-    cleanup_dir(destdir, tokeep)
+    tokeep = []
+    for trove, revision, link in comps:
+        fetch_component(trove, revision, link, destdir)
+        tokeep.append("%s-%s" % (trove, revision))
+    #cleanup_dir(destdir, tokeep)
 
 def main():
     api_site = "http://conary.foresightlinux.org/conary/api"
@@ -215,9 +255,9 @@ def main():
     cache = "rawdata"
     mkdir(cache)
     for b in labels:
-        refresh_source_list(api_site, b, cache)
-        refresh_pkg_list(api_site, b, cache)
-        refresh_components("%s/%s" % (cache, b.split("@")[1]))
+        #refresh_source_list(api_site, b, cache)
+        pkgs = refresh_pkg_list(api_site, b, cache)
+        refresh_components(pkgs, "%s/%s" % (cache, b.split("@")[1]))
 
 if __name__ == "__main__":
     main()

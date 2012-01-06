@@ -31,7 +31,6 @@ class TestXMLConvert(unittest.TestCase):
         self.assertEqual("1.7.7-1-1", pkg.revision)
         self.assertEqual(["is: x86", "is: x86_64"], pkg.flavors)
 
-        pkg.read_info()
         self.assertEqual("git:source", pkg.source)
         self.assertEqual(146239829, pkg.size)
         self.assertEqual(1318314231, pkg.buildtime)
@@ -49,7 +48,6 @@ class TestXMLConvert(unittest.TestCase):
 
     def test_subpkg_has_correct_source(self):
         pkg = test_label.bin_pkgs["git-svn"]
-        pkg.read_info()
         self.assertEqual("git:source", pkg.source)
 
     def test_no_flavor_pkg(self):

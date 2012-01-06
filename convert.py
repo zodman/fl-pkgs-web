@@ -7,12 +7,6 @@ def mkdir(path):
     if not os.path.exists(path):
         os.makedirs(path)
 
-def collect_component_list(xml):
-    '''Collect name " from a <trovelist></trovelist>
-    '''
-    ret = [t.find("name").text for t in xml.find("trovelist")]
-    return ret
-
 def read_trove_filelist(fname):
     '''Read a list of file names from the <trove> info of a component, which
     should contain a list of <fileref>
@@ -23,44 +17,9 @@ def read_trove_filelist(fname):
         ret.append(fileref.find("path").text)
     return ret
 
-class TroveInfoParser:
-    def __init__(self, fname):
-        size = None
-        source = None
-        buildtime = None
-        # note: can be none
-        buildlog = None
-        included = []
-
-        xml = etree.parse(fname)
-        for e in xml.getroot():
-            if e.tag == "size":
-                size = int(e.text)
-            elif e.tag == "source":
-                # only take trovelist[0]. There should always be only one :source.
-                source = e.find("trovelist")[0].find("name").text
-            elif e.tag == "buildtime":
-                buildtime = int(e.text)
-            elif e.tag == "buildlog":
-                buildlog = e.get("id")
-            elif e.tag == "included":
-                included = collect_component_list(e)
-
-        self.size = size
-        self.source = source
-        self.buildtime = buildtime
-        self.buildlog = buildlog
-        self.included = included
-
 class Package:
     def __init__(self, data, cache):
         '''Information about a package
-
-        When Package is first instantiated, it only contains the basic
-        information (name/revision/flavors); read_info() would read more info
-        (size/source/buildtime etc); read_filelist() would read the filelist.
-
-        Divided into multiple steps for the sake of efficiency.
         '''
         self.cache = cache
 
@@ -69,44 +28,18 @@ class Package:
         self.revision = data["revision"]
         # list of flavor names; would be [None] if this is a no-flavor pkg
         self.flavors = data["flavors"]
-
-        # info available after read_info()
-        self.size = None # int
-        self.source = None # str
-        self.buildtime = None # int; unix time
-        self.buildlog = None # url
-        self.included = [] # list of names
+        self.size = data["size"]
+        self.source = data["source"]
+        self.buildtime = data["buildtime"]
+        self.buildlog = data["buildlog"]
+        self.included = data["included"]
 
         # info available after read_filelist()
         self.filelist = [] # list of files
 
-        # can be 1, 2, or 3. indicating how much info has been read.
-        self._info_completion = 1
-
-    def read_info(self):
-        '''Read detailed information from cached data
-        '''
-        if self._info_completion >= 2:
-            return
-
-        fname = "%s/%s-%s" % (self.cache, self.name, self.revision)
-        info = TroveInfoParser(fname)
-        self.size = info.size
-        self.source = info.source
-        self.buildtime = info.buildtime
-        self.buildlog = info.buildlog
-        self.included = info.included
-
-        self._info_completion = 2
-
     def read_filelist(self):
         '''Read filelist from components
         '''
-        if self._info_completion >= 3:
-            return
-        if self._info_completion < 2:
-            self.read_info()
-
         self.filelist = []
         for trove in self.included:
             f = "%s/components/%s-%s" % (self.cache, trove, self.revision)
@@ -118,8 +51,6 @@ class Package:
                 # omitted (:debuginfo, :test etc)
                 if e.errno == 2:
                     continue
-
-        self._info_completion = 3
 
     def __repr__(self):
         return "%s=%s" % (self.name, self.revision)
@@ -189,9 +120,9 @@ class Label:
         pkgs = json.load(f)
         f.close()
 
-        for pkg in pkgs:
-            pkg = Package(pkg, "%s/%s" % (self.cache, label.split("@")[1]))
-            self.bin_pkgs[pkg.name] = pkg
+        for name, data in pkgs.items():
+            pkg = Package(data, "%s/%s" % (self.cache, label.split("@")[1]))
+            self.bin_pkgs[name] = pkg
 
 def cleanup_pkg_collection(coll, tokeep):
     '''Clean up the mongo collection @coll according to the pkg set @tokeep
@@ -222,7 +153,6 @@ def write_bin_pkgs(db, label):
             continue
 
         # skip if there is no corresponding :source
-        pkg.read_info()
         src = label.src_pkgs.get(pkg.source, None)
         if not (src and pkg.revision.startswith(src.revision)):
             del label.bin_pkgs[name]
