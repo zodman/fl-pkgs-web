@@ -54,32 +54,42 @@ class TroveInfoParser:
 
 class Package:
     def __init__(self, data, cache):
+        '''Information about a package
+
+        When Package is first instantiated, it only contains the basic
+        information (name/revision/flavors); read_info() would read more info
+        (size/source/buildtime etc); read_filelist() would read the filelist.
+
+        Divided into multiple steps for the sake of efficiency.
+        '''
         self.cache = cache
+
+        # basic info
         self.name = data["name"]
         self.revision = data["revision"]
         # list of flavor names; would be [None] if this is a no-flavor pkg
         self.flavors = data["flavors"]
 
+        # info available after read_info()
         self.size = None # int
         self.source = None # str
         self.buildtime = None # int; unix time
         self.buildlog = None # url
         self.included = [] # list of names
+
+        # info available after read_filelist()
         self.filelist = [] # list of files
 
-        self._info_complete = False
+        # can be 1, 2, or 3. indicating how much info has been read.
+        self._info_completion = 1
 
-    def read_info(self, with_filelist=True):
+    def read_info(self):
         '''Read detailed information from cached data
         '''
-        if self._info_complete:
+        if self._info_completion >= 2:
             return
-        self._parse("%s/%s-%s" % (self.cache, self.name, self.revision))
-        if with_filelist:
-            self._read_filelist()
-        self._info_complete = True
 
-    def _parse(self, fname):
+        fname = "%s/%s-%s" % (self.cache, self.name, self.revision)
         info = TroveInfoParser(fname)
         self.size = info.size
         self.source = info.source
@@ -87,9 +97,16 @@ class Package:
         self.buildlog = info.buildlog
         self.included = info.included
 
-    def _read_filelist(self):
+        self._info_completion = 2
+
+    def read_filelist(self):
         '''Read filelist from components
         '''
+        if self._info_completion >= 3:
+            return
+        if self._info_completion < 2:
+            self.read_info()
+
         self.filelist = []
         for trove in self.included:
             f = "%s/components/%s-%s" % (self.cache, trove, self.revision)
@@ -102,11 +119,12 @@ class Package:
                 if e.errno == 2:
                     continue
 
+        self._info_completion = 3
+
     def __repr__(self):
         return "%s=%s" % (self.name, self.revision)
 
     def to_dict(self):
-        self.read_info()
         return {
             "name": self.name,
             "revision": self.revision,
@@ -202,12 +220,16 @@ def write_bin_pkgs(db, label):
         # whether the pkg has been changed
         if existing and existing["revision"] == pkg.revision:
             continue
-        pkg = pkg.to_dict()
+
         # skip if there is no corresponding :source
-        src = label.src_pkgs.get(pkg["source"], None)
-        if not (src and pkg["revision"].startswith(src.revision)):
+        pkg.read_info()
+        src = label.src_pkgs.get(pkg.source, None)
+        if not (src and pkg.revision.startswith(src.revision)):
             del label.bin_pkgs[name]
             continue
+
+        pkg.read_filelist()
+        pkg = pkg.to_dict()
         pkg["_id"] = name # use pkg name as id
         coll.save(pkg)
         n += 1

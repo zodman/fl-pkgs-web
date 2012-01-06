@@ -27,10 +27,11 @@ class TestXMLConvert(unittest.TestCase):
 
     def test_read_pkg_info(self):
         pkg = test_label.bin_pkgs["git"]
-        pkg.read_info(with_filelist=False)
         self.assertEqual("git", pkg.name)
         self.assertEqual("1.7.7-1-1", pkg.revision)
         self.assertEqual(["is: x86", "is: x86_64"], pkg.flavors)
+
+        pkg.read_info()
         self.assertEqual("git:source", pkg.source)
         self.assertEqual(146239829, pkg.size)
         self.assertEqual(1318314231, pkg.buildtime)
@@ -48,22 +49,15 @@ class TestXMLConvert(unittest.TestCase):
 
     def test_subpkg_has_correct_source(self):
         pkg = test_label.bin_pkgs["git-svn"]
-        pkg.read_info(with_filelist=False)
+        pkg.read_info()
         self.assertEqual("git:source", pkg.source)
 
     def test_no_flavor_pkg(self):
         pkg = test_label.bin_pkgs["wqy-zenhei"]
-        pkg.read_info(with_filelist=False)
-        self.assertEqual([None], pkg.flavors)
-
-    def test_no_flavor_pkg(self):
-        pkg = test_label.bin_pkgs["wqy-zenhei"]
-        pkg.read_info(with_filelist=False)
         self.assertEqual([None], pkg.flavors)
 
     def test_more_than_2_flavors(self):
         pkg = test_label.bin_pkgs["gnucash"]
-        pkg.read_info(with_filelist=False)
         self.assertEqual(
                 sorted(["~builddocs is: x86", "~!builddocs is: x86",
                     "~builddocs is: x86_64", "~!builddocs is: x86_64"]),
