@@ -7,19 +7,6 @@ def mkdir(path):
     if not os.path.exists(path):
         os.makedirs(path)
 
-def collect_builddep_list(xml):
-    '''Collect (name, label, revision) tuples" from a <trovelist></trovelist>
-    '''
-    ret = []
-    for t in xml.find("trovelist"):
-        name = t.find("name").text
-        if ":" in name:
-            continue
-        label = t.find("version").find("label").text
-        revision = t.find("version").find("revision").text
-        ret.append((name, label, revision))
-    return ret
-
 def collect_component_list(xml):
     '''Collect name " from a <trovelist></trovelist>
     '''
@@ -43,7 +30,6 @@ class TroveInfoParser:
         buildtime = None
         # note: can be none
         buildlog = None
-        builddeps = []
         included = []
 
         xml = etree.parse(fname)
@@ -57,8 +43,6 @@ class TroveInfoParser:
                 buildtime = int(e.text)
             elif e.tag == "buildlog":
                 buildlog = e.get("id")
-            #elif e.tag == "builddeps":
-            #    builddeps = collect_builddep_list(e)
             elif e.tag == "included":
                 included = collect_component_list(e)
 
@@ -66,7 +50,6 @@ class TroveInfoParser:
         self.source = source
         self.buildtime = buildtime
         self.buildlog = buildlog
-        self.builddeps = builddeps
         self.included = included
 
 class Package:
@@ -81,7 +64,6 @@ class Package:
         self.source = None # str
         self.buildtime = None # int; unix time
         self.buildlog = None # url
-        self.builddeps = [] # list of (name, label, revision) tuples
         self.included = [] # list of names
         self.filelist = [] # list of files
 
@@ -103,7 +85,6 @@ class Package:
         self.source = info.source
         self.buildtime = info.buildtime
         self.buildlog = info.buildlog
-        self.builddeps = info.builddeps
         self.included = info.included
 
     def _read_filelist(self):
@@ -134,8 +115,6 @@ class Package:
             "source": self.source,
             "buildtime": self.buildtime,
             "buildlog": self.buildlog,
-            # not outputing builddeps. Not sure if it's useful.
-            #"builddeps": self.builddeps,
             "included": self.included,
             "filelist": self.filelist,
             }
