@@ -22,7 +22,7 @@ class SourceTrove:
     def __init__(self, data):
         self.name = data["name"]
         self.revision = data["revision"]
-        self.binpkgs = data.get("binpkgs", [])
+        self.binpkgs = data["binpkgs"]
 
 class Package:
     def __init__(self, data):
@@ -83,10 +83,6 @@ class Branch:
             name += ":source"
         pkg = self._src_pkgs.find_one({"name": name})
         if pkg:
-            binpkgs = self._bin_pkgs.find({"source": name},
-                    fields={"filelist": False},
-                    sort=[("name", pymongo.ASCENDING)])
-            pkg["binpkgs"] = [p["name"] for p in binpkgs]
             return SourceTrove(pkg)
         else:
             return None

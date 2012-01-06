@@ -73,11 +73,13 @@ class SourceTrove:
         self.name = xml.find("name").text
         self.revision = xml.find("version").find("revision").text
         self.ordering = float(xml.find("version").find("ordering").text)
+        self.binpkgs = []
 
     def to_dict(self):
         return {
             "name": self.name,
             "revision": self.revision,
+            "binpkgs": self.binpkgs,
             }
 
 class Label:
@@ -123,6 +125,7 @@ class Label:
         for name, data in pkgs.items():
             pkg = Package(data, "%s/%s" % (self.cache, label.split("@")[1]))
             self.bin_pkgs[name] = pkg
+            src.binpkgs.append(name)
 
 def cleanup_pkg_collection(coll, tokeep):
     '''Clean up the mongo collection @coll according to the pkg set @tokeep
