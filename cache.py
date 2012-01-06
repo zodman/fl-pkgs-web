@@ -87,6 +87,7 @@ def write_pkg_list(pkgs, dest):
     '''Write the parsed pkg list instead of the raw XML. So we don't have to
     repeat ourselves in convert.py
     '''
+    log("dumping json to %s" % dest)
     f = open(dest, "w")
     json.dump(pkgs, f)
     f.close()
