@@ -196,6 +196,7 @@ def refresh_pkg_list(api_site, label, cachedir):
     api = "%s/trove?label=%s&type=package&type=group" % (api_site, label)
     content = fetch_api_data(api, None)
     pkgs = parse_pkg_list(content)
+    changed_pkgs = {}
 
     destdir = "%s/%s" % (cachedir, label.split("@")[-1])
     mkdir(destdir)
@@ -204,13 +205,11 @@ def refresh_pkg_list(api_site, label, cachedir):
         if name not in pkgdata or pkg.revision != pkgdata[name]["revision"]:
             pkg.fetch_details(destdir)
             pkgdata[name] = pkg.to_dict()
+            changed_pkgs[name] = pkg
 
     write_pkg_list(pkgdata, dest)
 
-    tokeep = ["%s-%s" % (p.name, p.revision) for p in pkgs.values()]
-    cleanup_dir(destdir, tokeep)
-
-    return pkgs
+    return changed_pkgs, pkgdata
 
 def refresh_source_list(api_site, label, cachedir):
     api = "%s/trove?label=%s&type=source" % (api_site, label)
@@ -225,20 +224,29 @@ def refresh_components(pkgs, labeldir):
     destdir = "%s/components" % labeldir
     mkdir(destdir)
 
-    comps = []
     for name, pkg in pkgs.items():
         if name.startswith("group-"):
             continue
         for trove, link in pkg.included:
             if trove.endswith(":debuginfo") or trove.endswith(":test"):
                 continue
-            comps.append((trove, pkg.revision, link))
+            fetch_component(trove, pkg.revision, link, destdir)
 
-    tokeep = []
-    for trove, revision, link in comps:
-        fetch_component(trove, revision, link, destdir)
-        tokeep.append("%s-%s" % (trove, revision))
-    #cleanup_dir(destdir, tokeep)
+def cleanup_cache(pkgdata, labeldir):
+    # cleanup pkgs, i.e. rawdata/fl:*/
+    pkgs = ["%s-%s" % (name, p["revision"]) for name, p in pkgdata.items()]
+    cleanup_dir(labeldir, pkgs)
+
+    # cleanup components, i.e. rawdata/fl:*/components
+    compos = []
+    for name, pkg in pkgdata.items():
+        if name.startswith("group-"):
+            continue
+        for trove in pkg["included"]:
+            if trove.endswith(":debuginfo") or trove.endswith(":test"):
+                continue
+            compos.append("%s-%s" % (trove, pkg["revision"]))
+    cleanup_dir("%s/components" % labeldir, compos)
 
 def main():
     api_site = "http://conary.foresightlinux.org/conary/api"
@@ -255,9 +263,11 @@ def main():
     cache = "rawdata"
     mkdir(cache)
     for b in labels:
+        labeldir = "%s/%s" % (cache, b.split("@")[1])
         #refresh_source_list(api_site, b, cache)
-        pkgs = refresh_pkg_list(api_site, b, cache)
-        refresh_components(pkgs, "%s/%s" % (cache, b.split("@")[1]))
+        changed_pkgs, pkgs = refresh_pkg_list(api_site, b, cache)
+        refresh_components(changed_pkgs, labeldir)
+        cleanup_cache(pkgs, labeldir)
 
 if __name__ == "__main__":
     main()
