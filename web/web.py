@@ -86,7 +86,7 @@ class Branch:
             binpkgs = self._bin_pkgs.find({"source": name},
                     fields={"filelist": False},
                     sort=[("name", pymongo.ASCENDING)])
-            pkg["binpkgs"] = [Package(p) for p in binpkgs]
+            pkg["binpkgs"] = [p["name"] for p in binpkgs]
             return SourceTrove(pkg)
         else:
             return None

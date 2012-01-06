@@ -5,6 +5,6 @@
 The following binary packages are built from this source package:
 <ul>
 %for pkg in src.binpkgs:
-  <li><a href="/{{branch.name}}/{{pkg.name}}">{{pkg.name}}</a></li>
+  <li><a href="/{{branch.name}}/{{pkg}}">{{pkg}}</a></li>
 %end
 </ul>
