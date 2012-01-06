@@ -123,18 +123,33 @@ class Label:
         pkgs = json.load(f)
         f.close()
 
+        potential_nils = []
         for name, data in pkgs.items():
             pkg = Package(data, "%s/%s" % (self.cache, label.split("@")[1]))
 
             src = self.src_pkgs.get(pkg.source, None)
             if not src:
                 continue
-            mainpkg = pkgs.get(pkg.source.split(":")[0], None)
-            if not mainpkg or pkg.revision != mainpkg["revision"]:
-                continue
+            if not pkg.revision.startswith(src.revision):
+                potential_nils.append(pkg)
 
             self.bin_pkgs[name] = pkg
             src.binpkgs.append(name)
+
+        self._remove_potential_nils(potential_nils)
+
+    def _remove_potential_nils(self, potential_nils):
+        def get_newest_pkg(src):
+            pkgs = [self.bin_pkgs[n] for n in src.binpkgs]
+            # buildtime is int
+            return max(pkgs, key=lambda p: p.buildtime)
+
+        for pkg in potential_nils:
+            src = self.src_pkgs[pkg.source]
+            newest = get_newest_pkg(src)
+            if pkg.revision != newest.revision:
+                src.binpkgs.remove(pkg.name)
+                del self.bin_pkgs[pkg.name]
 
 def cleanup_pkg_collection(coll, tokeep):
     '''Clean up the mongo collection @coll according to the pkg set @tokeep
