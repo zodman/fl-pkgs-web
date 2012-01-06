@@ -36,6 +36,11 @@ class Package:
         self.troveinfo = xmlelement.get("id")
         self.flavors = [xmlelement.find("flavor").text]
 
+    def fetch_details(self, destdir):
+        f = "%s/%s-%s" % (destdir, self.name, self.revision)
+        if not os.path.exists(f):
+            fetch_api_data(self.troveinfo, f)
+
     def to_dict(self):
         return dict(name=self.name, revision=self.revision, flavors=self.flavors)
 
@@ -76,16 +81,21 @@ def parse_pkg_list(xml):
             pkgs[pkg.name].flavors.extend(pkg.flavors)
             continue
         pkgs[pkg.name] = pkg
-    ret = pkgs.values()
-    return ret
+    return pkgs
 
 def write_pkg_list(pkgs, dest):
     '''Write the parsed pkg list instead of the raw XML. So we don't have to
     repeat ourselves in convert.py
     '''
     f = open(dest, "w")
-    json.dump([pkg.to_dict() for pkg in pkgs], f)
+    json.dump(pkgs, f)
     f.close()
+
+def read_pkg_list(dest):
+    f = open(dest)
+    pkgs = json.load(f)
+    f.close()
+    return pkgs
 
 def fetch_component_info(link, f):
     if os.path.exists(f):
@@ -142,22 +152,26 @@ def fetch_components_for_pkg(pkgfile, destdir):
 def refresh_pkg_list(api_site, label, cachedir):
     '''Fetch the list of pkgs
     '''
+    dest = "%s/%s" % (cachedir, label)
+    pkgdata = {}
+    if os.path.exists(dest):
+        pkgdata = read_pkg_list(dest)
+
     api = "%s/trove?label=%s&type=package&type=group" % (api_site, label)
     content = fetch_api_data(api, None)
-
     pkgs = parse_pkg_list(content)
-    dest = "%s/%s" % (cachedir, label)
-    write_pkg_list(pkgs, dest)
 
     destdir = "%s/%s" % (cachedir, label.split("@")[-1])
     mkdir(destdir)
 
-    for pkg in pkgs:
-        f = "%s/%s-%s" % (destdir, pkg.name, pkg.revision)
-        if not os.path.exists(f):
-            fetch_api_data(pkg.troveinfo, f)
+    for name, pkg in pkgs.items():
+        if name not in pkgdata or pkg.revision != pkgdata[name]["revision"]:
+            pkg.fetch_details(destdir)
+            pkgdata[name] = pkg.to_dict()
 
-    tokeep = ["%s-%s" % (p.name, p.revision) for p in pkgs]
+    write_pkg_list(pkgdata, dest)
+
+    tokeep = ["%s-%s" % (p.name, p.revision) for p in pkgs.values()]
     cleanup_dir(destdir, tokeep)
 
 def refresh_source_list(api_site, label, cachedir):
