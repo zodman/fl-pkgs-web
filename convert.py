@@ -204,6 +204,19 @@ class Label:
             pkg = Package(pkg, "%s/%s" % (self.cache, label.split("@")[1]))
             self.bin_pkgs[pkg.name] = pkg
 
+def cleanup_pkg_collection(coll, tokeep):
+    '''Clean up the mongo collection @coll according to the pkg set @tokeep
+
+    @tokeep should be either label.bin_pkgs or label.src_pkgs.
+    '''
+    print " cleaning up db"
+    for pkg in coll.find():
+        name = pkg["name"]
+        if not name in tokeep:
+            print " removing %s" % name
+            coll.remove({"_id": name})
+    print " db now has %d." % coll.count()
+
 # not sure about the schema. for now use two separate collections for
 # binary and source pkgs
 def write_bin_pkgs(db, label):
@@ -213,8 +226,8 @@ def write_bin_pkgs(db, label):
             label.branch, len(label.bin_pkgs), coll.count())
 
     n = 0
-    for pkg in label.bin_pkgs.values():
-        existing = coll.find_one({"name": pkg.name})
+    for name, pkg in label.bin_pkgs.items():
+        existing = coll.find_one({"name": name})
         # whether the pkg has been changed
         if existing and existing["revision"] == pkg.revision:
             continue
@@ -222,20 +235,14 @@ def write_bin_pkgs(db, label):
         # skip if there is no corresponding :source
         src = label.src_pkgs.get(pkg["source"], None)
         if not (src and pkg["revision"].startswith(src.revision)):
-            del label.bin_pkgs[pkg["name"]]
+            del label.bin_pkgs[name]
             continue
-        pkg["_id"] = pkg["name"] # use pkg name as id
+        pkg["_id"] = name # use pkg name as id
         coll.save(pkg)
         n += 1
     print " %d pkgs written." % n
 
-    # remove pkgs not present in @label
-    print " cleaning up db"
-    for pkg in coll.find():
-        if not pkg["name"] in label.bin_pkgs:
-            print " removing %s" % pkg["name"]
-            coll.remove({"_id": pkg["name"]})
-    print " db now has %d." % coll.count()
+    cleanup_pkg_collection(coll, label.bin_pkgs)
 
 def write_src_pkgs(db, label):
     coll = db[label.branch + ":source"]
@@ -244,24 +251,18 @@ def write_src_pkgs(db, label):
             label.branch, len(label.src_pkgs), coll.count())
 
     n = 0
-    for pkg in label.src_pkgs.values():
-        existing = coll.find_one({"name": pkg.name})
+    for name, pkg in label.src_pkgs.items():
+        existing = coll.find_one({"name": name})
         # whether the pkg has been changed
         if existing and existing["revision"] == pkg.revision:
             continue
         pkg = pkg.to_dict()
-        pkg["_id"] = pkg["name"] # use pkg name as id
+        pkg["_id"] = name # use pkg name as id
         coll.save(pkg)
         n += 1
     print " %d source pkgs written." % n
 
-    # remove pkgs not present in @label
-    print " cleaning up db"
-    for pkg in coll.find():
-        if not pkg["name"] in label.src_pkgs:
-            print " removing %s" % pkg["name"]
-            coll.remove({"_id": pkg["name"]})
-    print " db now has %d." % coll.count()
+    cleanup_pkg_collection(coll, label.src_pkgs)
 
 def convert():
     cache = "rawdata"
