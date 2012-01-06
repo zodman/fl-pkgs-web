@@ -1,16 +1,16 @@
 * cache.py: pull data from the conary repository (REST interface), and store in
   `./rawdata`.
 * convert.py: extract the information we are interested from the raw data
-  (XML), and store in `./info` (JSON).
+  (XML), and store in the mongodb.
   - test.py is a unittest for convert.py
-* web.py: server the JSON data to the web.
+* web.py: server the data to the web.
 
 * dataflow:
 
-        +----------------+             +-------------+               +------+
-        |   repository   |  cache.py   | local cache |  convert.py   | JSON |
-        | REST interface | ----------> |     XML     | ------------> |      |
-        +----------------+             +-------------+               +------+
+        +----------------+             +-------------+               +-------+
+        |   repository   |  cache.py   | local cache |  convert.py   | mongo |
+        |(REST interface)| ----------> |    (XML)    | ------------> |       |
+        +----------------+             +-------------+               +-------+
 
 * usage:
   - python cache.py | tee log-cache
