@@ -30,18 +30,14 @@ def read_trove_filelist(fname):
     '''Read a list of file names from the <trove> info of a component, which
     should contain a list of <fileref>
     '''
-    f = open(fname)
-    content = f.read()
-    f.close()
-
     ret = []
-    xml = etree.XML(content)
+    xml = etree.parse(fname)
     for fileref in xml.findall("fileref"):
         ret.append(fileref.find("path").text)
     return ret
 
 class TroveInfoParser:
-    def __init__(self, xml):
+    def __init__(self, fname):
         size = None
         source = None
         buildtime = None
@@ -50,7 +46,8 @@ class TroveInfoParser:
         builddeps = []
         included = []
 
-        for e in xml:
+        xml = etree.parse(fname)
+        for e in xml.getroot():
             if e.tag == "size":
                 size = int(e.text)
             elif e.tag == "source":
@@ -95,16 +92,13 @@ class Package:
         '''
         if self._info_complete:
             return
-        f = open("%s/%s-%s" % (self.cache, self.name, self.revision))
-        content = f.read()
-        f.close()
-        self._parse(etree.XML(content))
+        self._parse("%s/%s-%s" % (self.cache, self.name, self.revision))
         if with_filelist:
             self._read_filelist()
         self._info_complete = True
 
-    def _parse(self, xml):
-        info = TroveInfoParser(xml)
+    def _parse(self, fname):
+        info = TroveInfoParser(fname)
         self.size = info.size
         self.source = info.source
         self.buildtime = info.buildtime
@@ -182,11 +176,9 @@ class Label:
             self._read_bin_pkgs(b)
 
     def _read_src_pkgs(self, label):
-        f = open("%s/source-%s" % (self.cache, label))
-        content = f.read()
-        f.close()
+        f = "%s/source-%s" % (self.cache, label)
 
-        for e in etree.XML(content):
+        for e in etree.parse(f).getroot():
             pkg = SourceTrove(e)
             if pkg.revision.startswith("0-"):
                 continue

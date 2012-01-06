@@ -108,11 +108,7 @@ def fetch_components_for_pkg(pkgfile, destdir):
 
     ret = []
 
-    f = open(pkgfile)
-    content = f.read()
-    f.close()
-
-    xml = etree.XML(content)
+    xml = etree.parse(pkgfile)
     revision = xml.find("version").find("revision").text
 
     included = [(t.find("name").text, t.get("id"))
