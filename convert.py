@@ -118,12 +118,21 @@ class Label:
             self.src_pkgs[pkg.name] = pkg
 
     def _read_bin_pkgs(self, label):
+        # must be after _read_src_pkgs
         f = open("%s/%s" % (self.cache, label))
         pkgs = json.load(f)
         f.close()
 
         for name, data in pkgs.items():
             pkg = Package(data, "%s/%s" % (self.cache, label.split("@")[1]))
+
+            src = self.src_pkgs.get(pkg.source, None)
+            if not src:
+                continue
+            mainpkg = pkgs.get(pkg.source.split(":")[0], None)
+            if not mainpkg or pkg.revision != mainpkg["revision"]:
+                continue
+
             self.bin_pkgs[name] = pkg
             src.binpkgs.append(name)
 
@@ -153,12 +162,6 @@ def write_bin_pkgs(db, label):
         existing = coll.find_one({"name": name})
         # whether the pkg has been changed
         if existing and existing["revision"] == pkg.revision:
-            continue
-
-        # skip if there is no corresponding :source
-        src = label.src_pkgs.get(pkg.source, None)
-        if not (src and pkg.revision.startswith(src.revision)):
-            del label.bin_pkgs[name]
             continue
 
         pkg.read_filelist()

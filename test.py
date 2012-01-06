@@ -7,6 +7,8 @@ import convert
 test_b = "foresight.rpath.org@fl:2-qa"
 test_label = convert.Label([test_b], cache="datatest")
 
+test_label2 = convert.Label(["foresight.rpath.org@fl:2-devel"], cache="datatest")
+
 class TestXMLConvert(unittest.TestCase):
     def test_read_pkg_list(self):
         self.assertEqual(3578, len(test_label.bin_pkgs))
@@ -17,6 +19,14 @@ class TestXMLConvert(unittest.TestCase):
     def test_no_nil_pkg(self):
         self.assertEqual(0, len([p for p in test_label.bin_pkgs.values() if p.revision.startswith("0-")]))
         self.assertEqual(0, len([p for p in test_label.src_pkgs.values() if p.revision.startswith("0-")]))
+        # sub-pkg, where the main pkg has been nil
+        self.assertTrue("gcc-java" not in test_label.bin_pkgs)
+
+        # pkg whose latest recipe is not built yet
+        src = test_label2.src_pkgs["valgrind:source"]
+        pkg = test_label2.bin_pkgs["valgrind"]
+        self.assertEqual(src.revision, "3.7.0-0.3")
+        self.assertEqual(pkg.revision, "3.7.0-0.2-1")
 
     def test_label_get_pkg(self):
         self.assertEqual(None, test_label.bin_pkgs.get("gitx", None))
