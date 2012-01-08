@@ -234,6 +234,8 @@ def search_pkg(b, searchon, keyword):
 @view("searchfile")
 def search_file(b, searchon, keyword):
     keyword = keyword.decode("utf8")
+    if not keyword:
+        abort(404, "No found")
     branch = branches[b]
     files, truncated = branch.search_file(keyword, searchon=searchon)
     return dict(files=files, keyword=keyword, searchon=searchon, branch=branch,
@@ -246,6 +248,8 @@ def receive_search():
         b = "qa"
 
     keyword = urllib.quote(request.forms.keyword.encode("utf8"))
+    if not keyword:
+        redirect("/")
     searchon = request.forms.searchon
     if searchon not in ("package", "source", "path", "filename", "fullpath"):
         searchon = "package"
