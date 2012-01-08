@@ -4,7 +4,7 @@
 
 <p>
 %if searchon == "source":
-  You have searched for source packages
+  You have searched for source packages that
 %else:
   You have searched for packages that
 %end
