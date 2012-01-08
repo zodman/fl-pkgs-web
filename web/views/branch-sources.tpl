@@ -1,5 +1,7 @@
 %rebase layout title="Source packages in %s branch" % branch.name
 
+%include quick-search branch=branch.name
+
 <h1>Source Packages in the <b>{{branch.name}}</b> branch</h1>
 
 <p>

@@ -86,7 +86,7 @@ span.keyword {
 }
 
 #content {
-  margin: 20px 10px 0 52px;
+  margin: 0px 10px 0 52px;
 }
 
 .footer {
@@ -105,4 +105,8 @@ div.note {
   line-height: 2em;
   margin: 1.85em 0;
   padding: 0 2em 0 4em;
+}
+
+form.quick-search {
+  text-align: right;
 }

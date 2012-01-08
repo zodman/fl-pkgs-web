@@ -1,5 +1,7 @@
 %rebase layout title="File search result - %s in %s" % (keyword, branch.name)
 
+%include quick-search branch=branch.name
+
 <p>
 %if searchon == "path":
   You have searched for paths that end with

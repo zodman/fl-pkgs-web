@@ -1,5 +1,7 @@
 %rebase layout title="Details of %s in %s branch" % (pkg.name, branch.name)
 
+%include quick-search branch=branch.name
+
 <h1>Package: {{pkg.name}} ({{pkg.revision}})</h1>
 <p>branch <a href="/{{branch.name}}">{{branch.name}}</a></p>
 <p>full installed size: {{pkg.size}}</p>

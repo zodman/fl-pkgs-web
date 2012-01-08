@@ -1,5 +1,7 @@
 %rebase layout title="Package search result - %s in %s" % (keyword, branch.name)
 
+%include quick-search branch=branch.name
+
 <p>
 %if searchon == "source":
   You have searched for source packages
