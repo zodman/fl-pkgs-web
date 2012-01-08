@@ -31,9 +31,9 @@ FITS.
   <input type="submit" value="Search" />
   <br />
   Search on:
-  <input id="searchbin" type="radio" checked="checked" value="package" name="mode"/>
-  <label for="searchbin">Package names only</label>
-  <input id="searchsrc" type="radio" value="source" name="mode"/>
+  <input id="searchbin" type="radio" checked="checked" value="package" name="searchon"/>
+  <label for="searchbin">Package names</label>
+  <input id="searchsrc" type="radio" value="source" name="searchon"/>
   <label for="searchsrc">Source package names</label>
   <br/>
   <label for="pbranch">Branch:</label>
@@ -53,20 +53,19 @@ part of packages. You can also get a full list of files in a given package.
 
 <form action="/search" method="post">
 <fieldset>
-  <input type="hidden" name="searchtype" value="file"/>
   <label for="fkw">Keyword:</label>
   <input id="kfw" type="text" name="keyword" />
   <input type="submit" value="Search" />
   <br />
   Display:
   <br />
-  <input id="searchpathending" type="radio" value="pathending" name="mode" checked="checked" />
+  <input id="searchpathending" type="radio" value="path" name="searchon" checked="checked" />
   <label for="searchpathending">paths ending with the keyword</label>
   <br />
-  <input id="searchfile" type="radio" value="filename" name="mode" />
+  <input id="searchfile" type="radio" value="filename" name="searchon" />
   <label for="searchfile">filenames containing the keyword</label>
   <br />
-  <input id="searchpath" type="radio" value="fullpath" name="mode" />
+  <input id="searchpath" type="radio" value="fullpath" name="searchon" />
   <label for="searchpath">paths containing the keyword</label>
   <br />
   <label for="fbranch">Branch:</label>

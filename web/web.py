@@ -246,16 +246,10 @@ def receive_search():
         b = "qa"
 
     keyword = urllib.quote(request.forms.keyword.encode("utf8"))
-
-    searchtype = request.forms.searchtype
-    mode = request.forms.mode
-    if searchtype == "file":
-        if mode not in ("path", "filename", "fullpath"):
-            mode = "path"
-    else: # search for pkg
-        if mode not in ("source", "package"):
-            mode = "package"
-    redirect("/search/%s/%s/%s" % (b, mode, keyword))
+    searchon = request.forms.searchon
+    if searchon not in ("package", "source", "path", "filename", "fullpath"):
+        searchon = "package"
+    redirect("/search/%s/%s/%s" % (b, searchon, keyword))
 
 @route("/static/<filename:path>")
 @route("/<filename:re:robots.txt>")
