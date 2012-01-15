@@ -31,7 +31,7 @@ Please consider using a longer keyword.
 <tr><th>File</th><th>Package</th></tr>
 %for (path, pkg) in files:
   <tr>
-    <td class="file">{{!re.sub(r"(?i)(%s)" % keyword, r'<span class="keyword">\1</span>', path)}}</td>
+    <td class="file">{{!re.sub(r"(?i)(%s)" % re.escape(keyword), r'<span class="keyword">\1</span>', path)}}</td>
     <td><a href="/{{branch.name}}/{{pkg.name}}">{{pkg.name}}</a> ({{pkg.revision}})</td>
   </tr>
 %end

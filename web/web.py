@@ -88,7 +88,8 @@ class Branch:
             return None
 
     def search_pkg(self, keyword, skip=0, limit=50):
-        pkgs = self._bin_pkgs.find({"name": re.compile(keyword, re.IGNORECASE)},
+        pkgs = self._bin_pkgs.find(
+                {"name": re.compile(re.escape(keyword), re.IGNORECASE)},
                 skip=skip, limit=limit, fields={"filelist": False},
                 sort=[("name", pymongo.ASCENDING)])
         total = pkgs.count()
@@ -100,7 +101,7 @@ class Branch:
             keyword = keyword.split(":")[0]
         keyword += ".*:source"
         pkgs = self._src_pkgs.find(
-                {"name": re.compile(keyword, re.IGNORECASE)},
+                {"name": re.compile(re.escape(keyword), re.IGNORECASE)},
                 skip=skip, limit=limit,
                 sort=[("name", pymongo.ASCENDING)])
         total = pkgs.count()
@@ -220,7 +221,7 @@ def show_src_pkg(b, pkg):
 @view("searchpkg")
 def search_pkg(b, searchon, keyword):
     start, limit = get_pagination(request.query)
-    keyword = keyword.decode("utf8")
+    keyword = urllib.unquote(keyword).decode("utf8")
     branch = branches[b]
     if searchon == "source":
         pkgs, total = branch.search_src_pkg(keyword, start - 1, limit)
@@ -233,7 +234,7 @@ def search_pkg(b, searchon, keyword):
 @route("/search/%s/<searchon:re:(fullpath|path)>/<keyword:path>" % url_branches)
 @view("searchfile")
 def search_file(b, searchon, keyword):
-    keyword = keyword.decode("utf8")
+    keyword = urllib.unquote(keyword).decode("utf8")
     if not keyword:
         abort(404, "No found")
     branch = branches[b]
