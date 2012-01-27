@@ -1,5 +1,5 @@
 import os, json
-
+import argparse
 from lxml import etree
 import pymongo
 
@@ -208,21 +208,42 @@ def write_src_pkgs(db, label):
 
     cleanup_pkg_collection(coll, label.src_pkgs)
 
-def convert():
-    cache = "rawdata"
-    conn = pymongo.Connection()
-    db = conn.fl_pkgs
-    for b in [
+def convert(test = False):
+
+    labels_for_test = [
+          #  ("foresight.rpath.org@fl:2",
+          #   "foresight.rpath.org@fl:2-kernel"),
+            ("foresight.rpath.org@fl:2-qa",
+             #"foresight.rpath.org@fl:2-qa-kernel"
+                ),
+            ("foresight.rpath.org@fl:2-devel",
+             #"foresight.rpath.org@fl:2-devel-kernel"
+                ),
+            ]
+
+    labels_for_search = [
             ("foresight.rpath.org@fl:2",
              "foresight.rpath.org@fl:2-kernel"),
             ("foresight.rpath.org@fl:2-qa",
-             "foresight.rpath.org@fl:2-qa-kernel"),
+             "foresight.rpath.org@fl:2-qa-kernel"
+                ),
             ("foresight.rpath.org@fl:2-devel",
-             "foresight.rpath.org@fl:2-devel-kernel"),
-            ]:
+             "foresight.rpath.org@fl:2-devel-kernel"
+             ),
+            ]
+    if test:
+        labels_for_search = labels_for_test
+    cache = "rawdata"
+    conn = pymongo.Connection()
+    db = conn.fl_pkgs
+    for b in labels_for_search :
         label = Label(b, cache)
         write_bin_pkgs(db, label)
         write_src_pkgs(db, label)
 
 if __name__ == "__main__":
-    convert()
+    import sys
+    if 'test' in sys.argv:
+        convert(True)
+    else:
+        convert()

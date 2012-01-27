@@ -34,6 +34,7 @@
   - bottle
   - gevent (can be easily replaced)
   - mongodb and pymongo
+  - lxml
 
 * cached data size
   - included labels: fl:2, fl:2-kernel, fl:2-qa, fl:2-qa-kernel, fl:2-devel,
