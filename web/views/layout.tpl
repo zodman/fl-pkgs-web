@@ -81,6 +81,11 @@
 	<div class="content">
     %include
 	</div>
+<footer>
+<p>  Any issue with this website, please report to
+  <a href="https://github.com/zhangsen/fl-pkgs-web">the github page</a>.
+</p>
+</footer>
   </div>
 </body>
 </html>

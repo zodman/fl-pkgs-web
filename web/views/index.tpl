@@ -29,8 +29,9 @@ FITS.
   <label for="pkw">Keyword:</label>
 	<div class="input">
 	  	<input id="pkw" type="text" name="keyword" />
-  		<input type="submit" value="Search" />
+  		<input type="submit" value="Search" class="btn primary"/>
 	</div>
+  	<label for="pkw">Search on:</label>
 	<div class="input">
 		<ul class="inputs-list">
 			<li> 
@@ -70,30 +71,40 @@ part of packages. You can also get a full list of files in a given package.
 <form action="/search" method="post">
 <fieldset>
   <label for="fkw">Keyword:</label>
-  <input id="kfw" type="text" name="keyword" />
-  <input type="submit" value="Search" />
-  <br />
-  Display:
-  <br />
-  <input id="searchpathending" type="radio" value="path" name="searchon" checked="checked" />
-  <label for="searchpathending">paths ending with the keyword</label>
-  <br />
-  <input id="searchfile" type="radio" value="filename" name="searchon" />
-  <label for="searchfile">filenames containing the keyword</label>
-  <br />
-  <input id="searchpath" type="radio" value="fullpath" name="searchon" />
-  <label for="searchpath">paths containing the keyword</label>
-  <br />
+	<div class="input">
+ 	  <input id="kfw" type="text" name="keyword" />
+  	<input type="submit" value="Search"  class="btn primary"/>
+	</div>
+  <label for="searchpathending">Display</label>
+	<div class="input">
+		<ul class="inputs-list">
+			<li> 
+				<label>
+					paths ending with the keyword 
+					<input id="searchpathending" type="radio" value="path" name="searchon" checked="checked" />
+				<label>
+			</li>
+			<li> 
+					 <label for="searchfile">filenames containing the keyword
+							<input id="searchfile" type="radio" value="filename" name="searchon" />
+						</label>
+			</li>
+			<li> 
+						<label for="searchpath">paths containing the keyword
+								<input id="searchpath" type="radio" value="fullpath" name="searchon" />
+						</label>
+			</li>
+		</ul>
+	</div>
   <label for="fbranch">Branch:</label>
+	<div class="input">
   <select id="fbranch" name="branch">
     <option value="stable">stable</option>
     <option selected="selected" value="qa">qa</option>
     <option value="devel">devel</option>
   </select>
+	</div>
 </fieldset>
 </form>
 
-<div class="footer">
-  Any issue with this website, please report to
-  <a href="https://github.com/zhangsen/fl-pkgs-web">the github page</a>.
-</div>
+
