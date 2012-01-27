@@ -7,7 +7,7 @@
   <!-- 
   <link type="text/css" rel="stylesheet" media="all" href="/static/site.css" />
   -->
-  <link rel="stylesheet" href="http://twitter.github.com/bootstrap/1.4.0/bootstrap.min.css">
+  <link rel="stylesheet" href="/static/bootstrap.min.css">
   <link rel="shortcut icon" href="/static/img/favicon.ico" type="image/x-icon"/>
 
   <style type="text/css">

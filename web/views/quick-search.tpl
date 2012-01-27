@@ -8,5 +8,5 @@
     <option value="source">source package names</option>
     <option value="path">package contents</option>
   </select>
-  <input type="submit" value="Search">
+  <input type="submit" value="Search" class="btn primary">
 </form>
