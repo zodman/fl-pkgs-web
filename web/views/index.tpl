@@ -27,21 +27,37 @@ FITS.
 <form action="/search" method="post">
 <fieldset>
   <label for="pkw">Keyword:</label>
-  <input id="pkw" type="text" name="keyword" />
-  <input type="submit" value="Search" />
-  <br />
-  Search on:
-  <input id="searchbin" type="radio" checked="checked" value="package" name="searchon"/>
-  <label for="searchbin">Package names</label>
-  <input id="searchsrc" type="radio" value="source" name="searchon"/>
-  <label for="searchsrc">Source package names</label>
+	<div class="input">
+	  	<input id="pkw" type="text" name="keyword" />
+  		<input type="submit" value="Search" />
+	</div>
+	<div class="input">
+		<ul class="inputs-list">
+			<li> 
+				<label>
+				<input id="searchbin" type="radio" checked="checked" value="package" name="searchon"/>
+				<span>Packages names</span>
+				</label>
+			</li>
+			<li>	
+				<label>
+				<input id="searchsrc" type="radio" value="source" name="searchon"/>
+				<span>Source packages names</span>
+				</label>
+
+			</li>
+		</ul>
+
+	</div>
   <br/>
   <label for="pbranch">Branch:</label>
-  <select id="pbranch" name="branch">
-    <option value="stable">stable</option>
-    <option selected="selected" value="qa">qa</option>
-    <option value="devel">devel</option>
-  </select>
+  <div class="input">
+	  <select id="pbranch" name="branch">
+	    <option value="stable">stable</option>
+	    <option selected="selected" value="qa">qa</option>
+	    <option value="devel">devel</option>
+	  </select>
+  </div>
 </fieldset>
 </form>
 
